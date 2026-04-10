@@ -1,0 +1,65 @@
+StudyGroup MVP
+==============
+Target Users: Virginia Tech students
+
+Core Problem
+------------
+VT students need a low-friction way to find peers to study with
+right now, filtered by course and location on campus.
+
+MVP Feature Set
+---------------
+
+1. Auth
+   - Sign up / log in with VT email (@vt.edu)
+   - Basic profile: name, major, year
+
+2. Lobby System
+   - Create a study session ("lobby") with:
+       - Course ID (e.g. CS 3114, MATH 2114)
+       - Location (Torgersen, Newman, D2, Perry, etc.)
+       - Duration / availability window
+       - Max group size
+   - Browse open lobbies filtered by:
+       - Course ID
+       - Campus location
+       - Availability
+
+3. Join & Match
+   - One-tap join a lobby
+   - Host gets notified when someone joins
+   - Simple in-app chat per lobby (just enough to coordinate)
+
+4. Session End
+   - Host can close the lobby when done
+   - Lobby auto-expires after the set duration
+
+Out of Scope for MVP
+--------------------
+- Scheduling / calendar integration
+- Ratings or reputation system
+- Persistent friend/contact lists
+- Push notifications (email only for now)
+- Mobile app (web-first)
+
+Tech Stack (suggested)
+----------------------
+- Frontend: Next.js (React)
+- Backend: Supabase (auth, database, realtime)
+- Hosting: Vercel
+
+VT-Specific Locations to Support
+---------------------------------
+- Torgersen Hall
+- Newman Library
+- D2 (Dietrick Dining / study areas)
+- Perry Street Cafe
+- Surge Space
+- McBryde Hall
+- Goodwin Hall
+- Other (free text)
+
+Success Metric for MVP
+-----------------------
+A VT student can open the app, find an open lobby for their current
+class, and join it in under 60 seconds.

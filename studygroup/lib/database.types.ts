@@ -1,0 +1,145 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  public: {
+    Tables: {
+      lobbies: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          expires_at: string
+          host_id: string
+          id: string
+          location: string
+          max_size: number
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          expires_at: string
+          host_id: string
+          id?: string
+          location: string
+          max_size?: number
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string
+          host_id?: string
+          id?: string
+          location?: string
+          max_size?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lobbies_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lobby_members: {
+        Row: {
+          joined_at: string
+          lobby_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          lobby_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          lobby_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lobby_members_lobby_id_fkey"
+            columns: ["lobby_id"]
+            isOneToOne: false
+            referencedRelation: "lobbies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lobby_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          major: string | null
+          name: string
+          year: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          major?: string | null
+          name: string
+          year?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          major?: string | null
+          name?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  T extends keyof DefaultSchema["Tables"]
+> = DefaultSchema["Tables"][T]["Row"]
+
+export type TablesInsert<
+  T extends keyof DefaultSchema["Tables"]
+> = DefaultSchema["Tables"][T]["Insert"]
+
+export type TablesUpdate<
+  T extends keyof DefaultSchema["Tables"]
+> = DefaultSchema["Tables"][T]["Update"]
