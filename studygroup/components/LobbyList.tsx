@@ -60,12 +60,12 @@ export default function LobbyList({
           placeholder="Filter by course (e.g. CS 3114)"
           value={courseFilter}
           onChange={(e) => setCourseFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+          className="border rounded-lg px-3 py-2 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         />
         <select
           value={locationFilter}
           onChange={(e) => setLocationFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         >
           <option value="">All locations</option>
           {VT_LOCATIONS.map((loc) => (
