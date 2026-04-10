@@ -8,11 +8,14 @@ export default async function LobbiesPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: lobbies } = await supabase
+  const { data: lobbies, error: lobbiesError } = await supabase
     .from("lobbies")
-    .select("*, profiles(name), lobby_members(count)")
+    .select("*, profiles!lobbies_host_id_fkey(name), lobby_members!left(count)")
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
+
+  console.log("lobbies:", JSON.stringify(lobbies, null, 2));
+  console.log("error:", lobbiesError);
 
   return (
     <main className="min-h-screen bg-gray-50">

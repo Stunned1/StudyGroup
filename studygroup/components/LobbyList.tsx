@@ -80,7 +80,7 @@ export default function LobbyList({
       ) : (
         <div className="flex flex-col gap-4">
           {filtered.map((lobby) => {
-            const memberCount = lobby.lobby_members?.[0]?.count ?? 0;
+            const memberCount = Number(lobby.lobby_members?.[0]?.count ?? 0);
             const isFull = memberCount >= lobby.max_size;
             const isHost = lobby.host_id === userId;
             const expiresAt = new Date(lobby.expires_at);
