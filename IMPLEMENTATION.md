@@ -1,86 +1,91 @@
 # Implementation
 
-## Feature: StudyGroup MVP
+This file is a course compliance log. It records every AI-assisted contribution to this codebase — what was built, which tools were used, what prompts were given, whether the output met expectations, and what modifications were needed.
 
-A location-based study session finder for Virginia Tech students. Students can sign up with their @vt.edu email, create "lobby" sessions tied to a course ID and campus location, and browse/join open lobbies from other students.
+**Do not edit past sessions. Do not delete entries. Add new sessions at the bottom.**
 
----
-
-## What Was Built
-
-| File/Folder | Description |
-|---|---|
-| `studygroup/app/login/page.tsx` | Login page with @vt.edu email validation |
-| `studygroup/app/signup/page.tsx` | Signup page (name, email, password) |
-| `studygroup/app/lobbies/page.tsx` | Browse open lobbies (server component) |
-| `studygroup/app/lobbies/new/page.tsx` | Create lobby page |
-| `studygroup/app/api/auth/signout/route.ts` | Sign out API route |
-| `studygroup/app/page.tsx` | Root redirect to /lobbies |
-| `studygroup/components/LobbyList.tsx` | Client component — lobby cards, filters, join/close |
-| `studygroup/components/NewLobbyForm.tsx` | Client component — lobby creation form |
-| `studygroup/middleware.ts` | Auth-gated routing via Supabase SSR |
-| `studygroup/lib/supabase/client.ts` | Typed browser Supabase client |
-| `studygroup/lib/supabase/server.ts` | Typed server Supabase client |
-| `studygroup/lib/database.types.ts` | Auto-generated TypeScript types from live schema |
-| `studygroup/lib/types.ts` | Shared app types and VT location constants |
-| Supabase migration | `profiles`, `lobbies`, `lobby_members` tables with RLS policies, realtime, and a trigger to auto-create profiles on signup |
+See `AGENTS.md` for detailed instructions on how to maintain this file.
 
 ---
 
-## AI Tool Used
-
-**Kiro** (this IDE's built-in AI agent), powered by an underlying LLM.
-
-Kiro was used in **Autopilot mode**, meaning it could read, write, and edit files directly in the workspace without manual approval of each change.
+## Sessions
 
 ---
 
-## How AI Was Used
+### Session 1 — Initial scaffold, Supabase integration, and full MVP build
 
-The entire codebase was generated through a multi-turn conversation with Kiro. The prompts were iterative and conversational:
+#### What Was Built
 
-1. **Initial prompt** — described the product concept (study group finder for VT students), asked for an MVP plan, `MVP.txt`, `AGENTS.md`, and starter code.
-2. **Supabase integration prompt** — "use your supabase superpower to use supabase, its already titled studygroup" — Kiro used its Supabase MCP tool to find the existing project, retrieve the URL and anon key, apply the database migration, and generate TypeScript types automatically.
-3. **Completion check** — asked if the starter code was finished; Kiro identified the missing `layout.tsx` metadata and fixed it.
-4. **Gitignore check** — asked to verify `.env.local` was ignored before pushing; Kiro confirmed via `git check-ignore`.
-5. **This file** — asked to create `IMPLEMENTATION.md` and update `AGENTS.md` to reflect course guidelines.
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `MVP.txt` | Outlines the MVP feature set, VT-specific locations, tech stack, and success metric | Yes |
+| `AGENTS.md` | Agent instructions for README and IMPLEMENTATION.md maintenance, changelog format, course compliance rules | Yes |
+| `studygroup/` | Next.js 15 app scaffolded via `create-next-app` with TypeScript, Tailwind, App Router | Yes |
+| `studygroup/.env.local` | Environment variables wired to the live Supabase project | Yes |
+| `studygroup/lib/supabase/client.ts` | Typed Supabase browser client using `@supabase/ssr` | Yes |
+| `studygroup/lib/supabase/server.ts` | Typed Supabase server client using `@supabase/ssr` and Next.js cookies | Yes |
+| `studygroup/lib/types.ts` | Shared TypeScript types (Profile, Lobby, LobbyMember) and VT campus location constants | Yes |
+| `studygroup/lib/database.types.ts` | TypeScript types auto-generated from the live Supabase schema | Yes |
+| `studygroup/middleware.ts` | Supabase SSR middleware that enforces auth-gated routing across all routes | Yes |
+| `studygroup/app/page.tsx` | Root page — redirects to `/lobbies` | Yes |
+| `studygroup/app/layout.tsx` | Root layout with metadata, Geist font, Tailwind globals | Partial (scaffolded by create-next-app, metadata updated by AI) |
+| `studygroup/app/login/page.tsx` | Login page with @vt.edu email validation and Supabase Auth sign-in | Yes |
+| `studygroup/app/signup/page.tsx` | Signup page with name, email, password and Supabase Auth sign-up | Yes |
+| `studygroup/app/lobbies/page.tsx` | Server component — fetches and renders open lobbies from Supabase | Yes |
+| `studygroup/app/lobbies/new/page.tsx` | Server component — renders the new lobby form | Yes |
+| `studygroup/app/api/auth/signout/route.ts` | POST route that calls `supabase.auth.signOut()` and redirects to `/login` | Yes |
+| `studygroup/components/LobbyList.tsx` | Client component — lobby cards with course/location filters, join button, close button | Yes |
+| `studygroup/components/NewLobbyForm.tsx` | Client component — lobby creation form with course ID, VT location picker, max size, duration | Yes |
+| Supabase migration (applied remotely) | `profiles`, `lobbies`, `lobby_members` tables; RLS policies; realtime enabled; Postgres trigger to auto-create profile on signup | Yes |
 
-No external prompts were copy-pasted from templates. All prompts were written naturally in chat.
+#### AI Tool(s) Used
+
+- **Kiro** — built-in AI agent in the Kiro IDE
+- Mode: Autopilot (agent reads and writes files directly without per-change approval)
+- Model: auto (Kiro selects model; exact model not exposed to user)
+- Kiro also used its **Supabase MCP integration** to interact with the hosted Supabase project directly — listing projects, applying migrations, fetching API keys, generating types, and checking security advisors
+
+#### Prompts Used
+
+Prompts were conversational and iterative. Listed in order:
+
+1. _(Provided the course description of the product)_ "We're making StudyGroup — [description of study group finder for VT students with lobby system]. Make an MVP.txt file to outline a quick MVP of what our product should be (remember, VT students). Make an AGENTS.md file so we can have detailed instructions for LLMs and agents when they update our codebase. Structure it like this: [provided example AGENTS.md format]. Then add some starter code for me to work with."
+2. "Use your supabase superpower to use supabase, its already titled studygroup" — triggered Kiro to use its Supabase MCP tool to find the existing project, wire up credentials, apply the schema, and generate types.
+3. "Don't forget to do what you were doing before too" — Kiro had paused after Supabase setup; this prompted it to finish the app pages and components.
+4. "Wait no I meant the agents.md and the mvp.txt" — clarified that the previous message was about verifying those files existed, not about code. Kiro confirmed both were already created correctly.
+5. "I don't think you ever finished it, was it finished?" — prompted Kiro to audit the project structure and confirm all files were present. It identified the `layout.tsx` metadata was still the default Next.js boilerplate and updated it.
+6. "Ok we're about to push to main, can you check that the gitignore is working for the .env.local" — Kiro read the `.gitignore` and ran `git check-ignore -v .env.local` to confirm it was covered by the `.env*` rule.
+7. "Ok, update the changelog and I'll push" — Kiro confirmed the changelog was already up to date from the build session and no new entry was needed.
+8. "Make an IMPLEMENTATION.md file. Add to AGENTS.md instructions on how to maintain it. Make sure agents adhere to course guidelines." — produced the first version of this file and updated AGENTS.md.
+9. "Make sure the AGENTS.md is DETAILED in its instructions. Remember that not all agents will be Kiro. Make sure IMPLEMENTATION.md is structured well and well maintained by the detailed instructions in AGENTS.md." — produced the current version of both files.
+
+#### What the Code Does and Whether It Met Expectations
+
+**Auth flow** — Login and signup pages validate `@vt.edu` email on the client before calling Supabase Auth. A Postgres trigger (`on_auth_user_created`) auto-inserts a row into `public.profiles` using the user's email and display name from metadata. Middleware redirects unauthenticated users to `/login` and authenticated users away from auth pages. This all worked as expected on first generation.
+
+**Lobby system** — Users create lobbies with a course ID (free text, uppercased), a campus location from a fixed VT list, an optional description, max group size (2–20), and a duration (30 min to 3 hours). `expires_at` is computed at creation time. The browse page queries only lobbies where `expires_at > now()`. Filters for course and location work client-side. Hosts can delete their own lobby; other users can join up to `max_size`. This matched the MVP spec from `MVP.txt`.
+
+**Database** — RLS policies restrict mutations to the row owner. Realtime was enabled on both `lobbies` and `lobby_members` via `alter publication supabase_realtime add table`. The schema passed Supabase's security advisor with zero warnings. One gap: the React client does not yet subscribe to realtime events, so the lobby list requires a manual page refresh to reflect joins. This is documented in README under Minor Gaps.
+
+**TypeScript types** — Initial `lib/types.ts` used hand-written types. After the Supabase migration was applied, Kiro generated `lib/database.types.ts` from the live schema via MCP and updated both Supabase clients to use the `Database` generic. This was a self-correction Kiro made without being prompted.
+
+**Overall** — The generated code met MVP expectations. The only unmet expectation is the missing realtime client subscription, which is a known gap, not a bug.
+
+#### Modifications Made
+
+- **Prompt refinement:** The initial prompt asked for "starter code" without specifying the full page structure. A follow-up ("don't forget to do what you were doing before") was needed to get Kiro to finish the components and pages after it paused to set up Supabase.
+- **Type correction:** Kiro self-corrected from hand-written types to generated types after applying the migration. No manual intervention was needed.
+- **Metadata update:** `app/layout.tsx` title and description were still the default Next.js boilerplate after scaffolding. Kiro updated them when prompted to audit completeness.
+- **AGENTS.md iteration:** The first version of AGENTS.md was modeled on a provided example and adapted for this project. A second pass (this session) rewrote it to be tool-agnostic, more detailed, and to include the session-based IMPLEMENTATION.md format.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Kiro — typed Supabase server client using @supabase/ssr` → `studygroup/lib/supabase/server.ts`
+- `// AI-GENERATED: Kiro — typed Supabase browser client using @supabase/ssr` → `studygroup/lib/supabase/client.ts`
+- `// AI-GENERATED: Kiro — Supabase SSR middleware for auth-gated routing` → `studygroup/middleware.ts`
+- `// AI-GENERATED: Kiro — lobby list client component with join/close logic and course/location filters` → `studygroup/components/LobbyList.tsx`
+- `// AI-GENERATED: Kiro — new lobby creation form with VT location picker and duration selector` → `studygroup/components/NewLobbyForm.tsx`
+- `// AI-GENERATED: Kiro — shared app types and VT campus location constants` → `studygroup/lib/types.ts`
+- `// AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema` → `studygroup/lib/database.types.ts`
 
 ---
-
-## What the Generated Code Does and Whether It Met Expectations
-
-**Auth flow** — Login and signup pages validate that the email ends in `@vt.edu` on the client before submitting to Supabase Auth. A Postgres trigger auto-creates a row in `public.profiles` on signup. This worked as expected.
-
-**Lobby system** — Users can create lobbies with a course ID, campus location (from a fixed VT-specific list), description, max group size, and duration. Lobbies auto-expire via a `expires_at` timestamp. The browse page filters by course and location. Hosts can close their own lobby; other users can join up to the max size. This matched the MVP spec.
-
-**Middleware** — All routes except `/login` and `/signup` require an authenticated session. Unauthenticated users are redirected to `/login`; authenticated users hitting auth pages are redirected to `/lobbies`. This worked correctly.
-
-**Database** — RLS policies were applied so users can only mutate their own data. Realtime was enabled on `lobbies` and `lobby_members` tables (though the client-side subscription is listed as a Minor Gap — the data is live in Supabase but the UI requires a manual refresh to reflect changes).
-
-**Overall** — The generated code did what was expected for an MVP. The one gap is that real-time lobby updates aren't wired into the React client yet, which is noted in the README under Minor Gaps.
-
----
-
-## Modifications Made
-
-- The initial `lib/types.ts` used hand-written types; after Kiro generated `database.types.ts` from the live schema, the Supabase clients were updated to use the typed `Database` generic — a small but important correction Kiro made on its own.
-- The `studygroup/README.md` was the default Next.js boilerplate; Kiro replaced it with the actual project README (setup, changelog, known bugs, deferred items) per the `AGENTS.md` rules.
-- The `AGENTS.md` changelog format was modeled after a provided example but adapted for this project's categories (Auth, Lobbies, Realtime, UI, Infrastructure, Bug Fixes) and with the no-dates rule explicitly set.
-
----
-
-## AI Comment Markers
-
-All files in `studygroup/` were generated by Kiro (AI). Key files are noted below:
-
-- `// AI-GENERATED: Kiro — lobby browse page with Supabase server client` → `app/lobbies/page.tsx`
-- `// AI-GENERATED: Kiro — lobby list client component with join/close logic` → `components/LobbyList.tsx`
-- `// AI-GENERATED: Kiro — new lobby form with VT location picker` → `components/NewLobbyForm.tsx`
-- `// AI-GENERATED: Kiro — Supabase SSR middleware for auth-gated routing` → `middleware.ts`
-- `// AI-GENERATED: Kiro — typed Supabase browser client` → `lib/supabase/client.ts`
-- `// AI-GENERATED: Kiro — typed Supabase server client` → `lib/supabase/server.ts`
-- `// AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema` → `lib/database.types.ts`
-
-The Supabase database migration (tables, RLS policies, trigger, realtime) was also fully AI-generated and applied directly to the hosted project via Kiro's Supabase MCP integration.
