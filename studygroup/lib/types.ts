@@ -1,10 +1,12 @@
 // AI-GENERATED: Kiro — shared app types and VT campus location constants
+// AI-ASSISTED: Cursor — Profile.avatar_url and Lobby.host typing
 export type Profile = {
   id: string;
   email: string;
   name: string;
   major: string | null;
   year: string | null;
+  avatar_url: string | null;
   created_at: string;
 };
 
@@ -19,7 +21,7 @@ export type Lobby = {
   created_at: string;
   // joined from members count
   member_count?: number;
-  host?: Pick<Profile, "name">;
+  host?: Pick<Profile, "name" | "avatar_url">;
 };
 
 export type LobbyMember = {

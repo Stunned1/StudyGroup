@@ -1,10 +1,12 @@
 // AI-GENERATED: Kiro — lobby list client component with join/close logic and course/location filters
+// AI-ASSISTED: Cursor — host avatar on cards; optional avatar_url when column missing from API
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import UserAvatar from "@/components/UserAvatar";
 import { createClient } from "@/lib/supabase/client";
 import { VT_LOCATIONS } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type LobbyRow = {
   id: string;
@@ -14,7 +16,7 @@ type LobbyRow = {
   max_size: number;
   expires_at: string;
   host_id: string;
-  profiles: { name: string } | null;
+  profiles: { name: string; avatar_url?: string | null } | null;
   lobby_members: { count: number }[];
 };
 
@@ -97,9 +99,20 @@ export default function LobbyList({
                     {lobby.description && (
                       <p className="text-gray-500 text-sm mt-1">{lobby.description}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-2">
-                      Host: {lobby.profiles?.name ?? "Unknown"} · {memberCount}/{lobby.max_size} members · {minsLeft}m left
-                    </p>
+                    <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                      <UserAvatar
+                        avatarUrl={lobby.profiles?.avatar_url ?? null}
+                        name={lobby.profiles?.name ?? "?"}
+                        sizePx={28}
+                      />
+                      <span>
+                        <span className="font-medium text-gray-600">
+                          {lobby.profiles?.name ?? "Unknown"}
+                        </span>
+                        {" · "}
+                        {memberCount}/{lobby.max_size} members · {minsLeft}m left
+                      </span>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-2 ml-4">
                     {isHost ? (

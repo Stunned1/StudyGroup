@@ -89,3 +89,101 @@ Prompts were conversational and iterative. Listed in order:
 - `// AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema` → `studygroup/lib/database.types.ts`
 
 ---
+
+### Session 2 — Profile UI, avatars, and Storage
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql` | Adds `profiles.avatar_url`, public `avatars` bucket, storage + profile update RLS | Yes |
+| `studygroup/app/(app)/layout.tsx` | Shared signed-in shell with `AppHeader` (profile + nav) | Yes |
+| `studygroup/app/(app)/lobbies/page.tsx` | Lobbies list under shared layout; query includes host `avatar_url` | Partial |
+| `studygroup/app/(app)/lobbies/new/page.tsx` | New lobby page under shared layout | Partial |
+| `studygroup/app/(app)/profile/page.tsx` | Server page loading current user profile for `/profile` | Yes |
+| `studygroup/components/AppHeader.tsx` | Top bar with avatar; dropdown: View profile, Sign out | Yes |
+| `studygroup/components/UserAvatar.tsx` | Circular image or initials; optional click for photo change | Yes |
+| `studygroup/components/ProfilePageClient.tsx` | Profile fields + avatar upload with Save/Cancel; major/year save | Yes |
+| `studygroup/components/LobbyList.tsx` | Host avatar on cards; extended `profiles` join shape | Partial |
+| `studygroup/next.config.ts` | `images.remotePatterns` for Supabase Storage host | Yes |
+| `studygroup/lib/database.types.ts` | `avatar_url` on `profiles` types | Partial |
+| `studygroup/lib/types.ts` | `Profile.avatar_url`; `Lobby.host` typing | Partial |
+| `studygroup/components/NewLobbyForm.tsx` | TypeScript fix: `VTLocation` for location select state | Partial |
+| Removed `studygroup/app/lobbies/*` | Replaced by `(app)` route group (URLs unchanged) | N/A |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Composer (agent routing)
+
+#### Prompts Used
+
+1. "Lets start actually adding a profile section … circle profile icon … dropdown … view profile … name, major, year … bigger profile picture … upload … save and cancel … updated top right and when viewed by other people."
+
+#### What the Code Does and Whether It Met Expectations
+
+**Navigation** — Signed-in routes use `(app)` layout with maroon bar: logo, New Lobby link, and avatar button. Avatar opens a menu with links to `/profile` and POST sign-out. Matches the request to replace the standalone sign-out control.
+
+**Profile page** — Shows name (read-only), major and year (editable with Save), and a large avatar. Tapping the avatar opens a file picker; after choosing an image, Save photo uploads to Storage (`avatars/{userId}/avatar.{ext}`) and writes `profiles.avatar_url`; Cancel clears the local preview. `router.refresh()` updates the server layout so the header avatar updates. Build passes locally after a small pre-existing `NewLobbyForm` location state typing fix.
+
+**Others seeing the photo** — Lobby list selects `profiles(name, avatar_url)` and renders `UserAvatar` next to the host line so joiners see the host’s picture when set.
+
+**Database** — Migration SQL is committed for manual run in Supabase; types were updated by hand to match until types are regenerated from the project.
+
+#### Modifications Made
+
+- **NewLobbyForm:** `useState<VTLocation>` and cast on `<select>` `onChange` so `next build` TypeScript passes (location state was inferred too narrowly vs `e.target.value`).
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — circular avatar with image or initials for StudyGroup` → `studygroup/components/UserAvatar.tsx`
+- `// AI-GENERATED: Cursor — top nav with avatar dropdown: view profile and sign out` → `studygroup/components/AppHeader.tsx`
+- `// AI-GENERATED: Cursor — profile view with avatar upload (save/cancel) and major/year fields` → `studygroup/components/ProfilePageClient.tsx`
+- `// AI-GENERATED: Cursor — shared shell for signed-in routes with profile avatar header` → `studygroup/app/(app)/layout.tsx`
+- `// AI-GENERATED: Cursor — server page that loads current user profile for viewing and editing` → `studygroup/app/(app)/profile/page.tsx`
+- `// AI-GENERATED: Cursor — Next.js image config for Supabase Storage public URLs` → `studygroup/next.config.ts`
+- `// AI-ASSISTED: Cursor — host avatar in cards; profiles join includes avatar_url` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: Cursor — open lobbies list (nav moved to (app) layout)` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: Cursor — create lobby page (nav moved to (app) layout)` → `studygroup/app/(app)/lobbies/new/page.tsx`
+- `// AI-ASSISTED: Cursor — profiles.avatar_url column for display and storage URLs` → `studygroup/lib/database.types.ts`
+- `// AI-ASSISTED: Cursor — Profile.avatar_url and Lobby.host typing` → `studygroup/lib/types.ts`
+- `// AI-ASSISTED: Cursor — VTLocation state typing for location select` → `studygroup/components/NewLobbyForm.tsx`
+
+---
+
+### Session 3 — Profile queries without `avatar_url` column; header display name fallbacks
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/lib/display-name.ts` | Resolves visible name: profile.name, then auth `user_metadata.name`, then email local-part | Yes |
+| `studygroup/app/(app)/layout.tsx` | Profile `select("*")`; passes `displayNameForUser`; avoids selecting non-existent `avatar_url` | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Embedded host profile uses `profiles!lobbies_host_id_fkey(*)` instead of listing `avatar_url` | Partial |
+| `studygroup/components/LobbyList.tsx` | Host `avatar_url` optional on joined type | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Composer (agent routing)
+
+#### Prompts Used
+
+1. "lobbies fetch: column profiles_1.avatar_url does not exist — fix, and also in the top right the initials are ST, which does not match the user."
+
+#### What the Code Does and Whether It Met Expectations
+
+PostgREST errors when the select list names a column that is not in the database. Switching to `select("*")` on `profiles` and `profiles!…(*)` on the lobby join lets the API return only columns that exist, so lobbies load before the avatar migration is applied. The **ST** initials came from the fallback label **"Student"** when the header’s `select("name, avatar_url")` failed entirely—so `profile` was missing and the UI used `?? "Student"` (first two letters **ST**). `displayNameForUser` now uses signup metadata name or the email prefix so the header matches the signed-in user even if the profile row is missing fields or the query shape changes.
+
+#### Modifications Made
+
+No further modifications after implementation; `npm run build` succeeded.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — display name from profile row with Supabase auth fallbacks` → `studygroup/lib/display-name.ts`
+- `// AI-ASSISTED: Cursor — profile select("*") and displayNameForUser when avatar_url or profile fetch fails` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: Cursor — open lobbies list; host profile embed profiles(*) when avatar_url may be missing` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: Cursor — host avatar on cards; optional avatar_url when column missing from API` → `studygroup/components/LobbyList.tsx`
+
+---

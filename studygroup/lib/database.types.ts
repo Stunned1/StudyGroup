@@ -1,4 +1,5 @@
 // AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema
+// AI-ASSISTED: Cursor — profiles.avatar_url column for display and storage URLs
 export type Json =
   | string
   | number
@@ -89,6 +90,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
           id: string
@@ -97,6 +99,7 @@ export type Database = {
           year: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email: string
           id: string
@@ -105,6 +108,7 @@ export type Database = {
           year?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string
           id?: string

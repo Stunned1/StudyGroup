@@ -1,0 +1,2 @@
+# Local environment — never commit secrets (Next.js / Supabase)
+.env.local

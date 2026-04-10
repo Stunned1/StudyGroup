@@ -1,16 +1,17 @@
 // AI-GENERATED: Kiro — new lobby creation form with VT location picker and duration selector
+// AI-ASSISTED: Cursor — VTLocation state typing for location select
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { VT_LOCATIONS } from "@/lib/types";
+import { VT_LOCATIONS, type VTLocation } from "@/lib/types";
 
 export default function NewLobbyForm({ userId }: { userId: string }) {
   const supabase = createClient();
   const router = useRouter();
   const [courseId, setCourseId] = useState("");
-  const [location, setLocation] = useState(VT_LOCATIONS[0]);
+  const [location, setLocation] = useState<VTLocation>(VT_LOCATIONS[0]);
   const [description, setDescription] = useState("");
   const [maxSize, setMaxSize] = useState(5);
   const [duration, setDuration] = useState(60); // minutes
@@ -60,7 +61,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
         <label className="text-sm font-medium text-gray-700">Location</label>
         <select
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={(e) => setLocation(e.target.value as VTLocation)}
           className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         >
           {VT_LOCATIONS.map((loc) => (
