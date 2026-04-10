@@ -1,6 +1,11 @@
 // AI-GENERATED: Kiro — new lobby creation form with VT location picker and duration selector
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { VT_LOCATIONS } from "@/lib/types";
+
 export default function NewLobbyForm({ userId }: { userId: string }) {
   const supabase = createClient();
   const router = useRouter();
@@ -47,7 +52,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
           value={courseId}
           onChange={(e) => setCourseId(e.target.value)}
           required
-          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         />
       </div>
 
@@ -56,7 +61,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
         <select
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         >
           {VT_LOCATIONS.map((loc) => (
             <option key={loc} value={loc}>{loc}</option>
@@ -71,7 +76,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
           placeholder="e.g. Working on HW3, bring your notes"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+          className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
         />
       </div>
 
@@ -84,7 +89,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
             max={20}
             value={maxSize}
             onChange={(e) => setMaxSize(Number(e.target.value))}
-            className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+            className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
           />
         </div>
         <div className="flex-1">
@@ -92,7 +97,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
           <select
             value={duration}
             onChange={(e) => setDuration(Number(e.target.value))}
-            className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+            className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
           >
             <option value={30}>30 min</option>
             <option value={60}>1 hour</option>
