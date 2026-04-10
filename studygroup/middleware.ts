@@ -1,3 +1,4 @@
+// AI-GENERATED: Kiro — Supabase SSR middleware for auth-gated routing
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 

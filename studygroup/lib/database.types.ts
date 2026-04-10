@@ -1,3 +1,4 @@
+// AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema
 export type Json =
   | string
   | number

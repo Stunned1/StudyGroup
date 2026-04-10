@@ -1,9 +1,5 @@
+// AI-GENERATED: Kiro — lobby list client component with join/close logic and course/location filters
 "use client";
-
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { VT_LOCATIONS } from "@/lib/types";
 
 type LobbyRow = {
   id: string;

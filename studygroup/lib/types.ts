@@ -1,3 +1,4 @@
+// AI-GENERATED: Kiro — shared app types and VT campus location constants
 export type Profile = {
   id: string;
   email: string;

@@ -1,9 +1,5 @@
+// AI-GENERATED: Kiro — new lobby creation form with VT location picker and duration selector
 "use client";
-
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { VT_LOCATIONS } from "@/lib/types";
 
 export default function NewLobbyForm({ userId }: { userId: string }) {
   const supabase = createClient();

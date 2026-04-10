@@ -104,6 +104,38 @@ If you add a new environment variable, script, or required setup step, update `#
 
 ---
 
+## How to Update IMPLEMENTATION.md
+
+`IMPLEMENTATION.md` lives at the repo root and must be kept current for course compliance. Update it when:
+
+- A new feature is added
+- A bug is fixed that changes behavior
+- A new AI tool or prompt strategy is used
+
+When updating, add to the relevant section:
+
+- **What Was Built** — add a new row to the file/folder table
+- **What the Generated Code Does** — append a short paragraph describing the new behavior and whether it met expectations
+- **Modifications Made** — note any prompt iterations or code corrections that were needed
+
+Do NOT rewrite the whole file — use `strReplace` to append to the correct section.
+
+---
+
+## Course Guidelines (Required)
+
+This project is submitted for a university course. All agents working on this codebase must adhere to the following:
+
+- **Label all AI-generated code.** Add a comment at the top of any file you create or significantly modify in the format:
+  ```
+  // AI-GENERATED: Kiro — <one sentence describing what this file does>
+  ```
+- **Log all significant changes in IMPLEMENTATION.md.** Every feature addition or fix must be reflected there, including what the code does, whether it met expectations, and any prompt/code modifications needed.
+- **Do not misrepresent authorship.** Do not remove or alter AI-generated markers. Do not claim AI-generated code was written by hand.
+- **Keep IMPLEMENTATION.md honest.** If generated code did not work as expected or required manual fixes, document that accurately.
+
+---
+
 ## General Rules
 
 - Always read `README.md` before starting work so you understand the current state of the project
