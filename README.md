@@ -27,6 +27,10 @@ Find your study group — a location-based study session finder for Virginia Tec
 
 **Infrastructure**
 
+- Renamed `middleware.ts` to `proxy.ts` and updated export to `proxy` per Next.js 15 convention
+- Added `turbopack.root` to `next.config.ts` to fix workspace root detection when running from a monorepo-style folder
+- Added Vitest + React Testing Library test suite (`__tests__/LobbyList.knock.test.tsx`, `vitest.config.ts`, `vitest.setup.ts`)
+- Added `test` script to `package.json` (`vitest --run`)
 - SQL migration and docs for `profiles.avatar_url`, public Storage bucket `avatars`, storage RLS, and profile self-update policy (`studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql`)
 - Next.js `images.remotePatterns` for Supabase Storage public object URLs
 - Scaffolded Next.js 15 app with TypeScript, Tailwind, and App Router
