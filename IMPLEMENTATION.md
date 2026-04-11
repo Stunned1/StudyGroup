@@ -187,3 +187,113 @@ No further modifications after implementation; `npm run build` succeeded.
 - `// AI-ASSISTED: Cursor — host avatar on cards; optional avatar_url when column missing from API` → `studygroup/components/LobbyList.tsx`
 
 ---
+
+### Session 2 — Profile system, avatar upload, app shell, and in-lobby chat
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Shared server layout for signed-in routes — fetches profile, passes name and avatar to header | Yes |
+| `studygroup/app/(app)/lobbies/page.tsx` | Refactored lobbies page inside `(app)` route group; uses wildcard profile select to handle missing `avatar_url` | Yes |
+| `studygroup/app/(app)/lobbies/new/page.tsx` | Create lobby page moved into `(app)` route group | Yes |
+| `studygroup/app/(app)/profile/page.tsx` | Server page that loads current user profile and renders `ProfilePageClient` | Yes |
+| `studygroup/components/AppHeader.tsx` | Top nav with VT maroon branding, "+ New Lobby" link, and avatar dropdown (view profile / sign out) | Yes |
+| `studygroup/components/UserAvatar.tsx` | Circular avatar component — shows photo or initials fallback at any size; supports tap-to-change | Yes |
+| `studygroup/components/ProfilePageClient.tsx` | Client component — avatar upload to Supabase Storage with save/cancel, editable major and year fields | Yes |
+| `studygroup/components/LobbyList.tsx` | Heavily extended — lobby cards now open a chat modal; in-lobby chat with realtime subscription; knock-to-join system with host Accept/Decline | Yes |
+| `studygroup/lib/display-name.ts` | Utility that resolves a display name from profile → auth metadata → email prefix → "Student" | Yes |
+| `studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql` | Adds `avatar_url` column to `profiles`, creates public `avatars` Storage bucket, sets storage RLS policies, adds profile self-update policy | Yes |
+| `studygroup/next.config.ts` | Added `images.remotePatterns` for Supabase Storage public URLs | Yes |
+
+#### AI Tool(s) Used
+
+- **Cursor** — AI code editor with inline generation and chat
+- Mode: inline generation and chat (not autopilot — changes were applied file by file)
+- Model: unknown (Cursor does not expose the model name in the editor)
+
+#### Prompts Used
+
+Prompts were not logged during this session. Based on the `// AI-GENERATED: Cursor` and `// AI-ASSISTED: Cursor` comments left in the files, the following work was done:
+
+1. Built the `(app)` route group shell with a shared layout that fetches the profile and renders `AppHeader`
+2. Created `AppHeader` with avatar dropdown menu
+3. Created `UserAvatar` with initials fallback
+4. Created `ProfilePageClient` with avatar upload to Supabase Storage and editable profile fields
+5. Extended `LobbyList` to open a chat modal on card click, with realtime `lobby_messages` subscription, message sending, knock-to-join, and host Accept/Decline
+6. Added `display-name.ts` to fix the "ST" initials bug caused by falling back to "Student"
+7. Applied wildcard `profiles(*)` selects in lobbies and layout queries to avoid breaking when `avatar_url` column doesn't exist yet
+
+#### What the Code Does and Whether It Met Expectations
+
+**App shell** — The `(app)` layout wraps all signed-in pages, fetches the user's profile server-side, and passes name and avatar URL to `AppHeader`. The header renders a circular avatar that opens a dropdown with "View profile" and "Sign out". This worked as expected.
+
+**Profile page** — Users can tap their avatar to pick a new photo (JPEG/PNG/WebP/GIF, max 2MB), preview it, then save or cancel. Saving uploads to `avatars/{uid}/avatar.{ext}` in Supabase Storage and updates `profiles.avatar_url`. Major and year are editable text fields saved separately. This worked as expected.
+
+**In-lobby chat** — Clicking a lobby card opens a modal with a chat thread. The component subscribes to `lobby_messages` Postgres changes via a Supabase Realtime channel scoped to the lobby ID. New messages appear live. Guests see a "🚪 Knock to join" button that inserts a `type: "knock"` message. The host sees Accept/Decline buttons on knock messages; accepting inserts the guest into `lobby_members`. This worked as expected.
+
+**Display name fix** — The original code defaulted to "Student" when no profile name was found, causing initials to render as "ST". The `displayNameForUser` utility falls back through auth metadata and email prefix before reaching "Student", fixing the bug.
+
+#### Modifications Made
+
+- The lobbies page and layout queries were changed from `profiles(name)` to `profiles(*)` to avoid a schema cache error when `avatar_url` doesn't exist yet on the database — this was a defensive fix applied by Cursor after the initial generation failed.
+- No other modifications were documented; prompts were not logged during this session.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — shared shell for signed-in routes with profile avatar header` → `app/(app)/layout.tsx`
+- `// AI-ASSISTED: Cursor — profile select("*") and displayNameForUser when avatar_url or profile fetch fails` → `app/(app)/layout.tsx`
+- `// AI-ASSISTED: Cursor — open lobbies list; host profile embed profiles(*) when avatar_url may be missing` → `app/(app)/lobbies/page.tsx`
+- `// AI-GENERATED: Cursor — server page that loads current user profile for viewing and editing` → `app/(app)/profile/page.tsx`
+- `// AI-ASSISTED: Cursor — create lobby page (nav moved to (app) layout)` → `app/(app)/lobbies/new/page.tsx`
+- `// AI-GENERATED: Cursor — top nav with avatar dropdown: view profile and sign out` → `components/AppHeader.tsx`
+- `// AI-GENERATED: Cursor — circular avatar with image or initials for StudyGroup` → `components/UserAvatar.tsx`
+- `// AI-GENERATED: Cursor — profile view with avatar upload (save/cancel) and major/year fields` → `components/ProfilePageClient.tsx`
+- `// AI-GENERATED: Cursor — display name from profile row with Supabase auth fallbacks` → `lib/display-name.ts`
+
+---
+
+### Session 3 — Bug fixes, test suite, and changelog audit
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/proxy.ts` | Renamed from `middleware.ts`; export renamed from `middleware` to `proxy` per Next.js 15 convention | Partial (rename by Kiro, original file by Kiro) |
+| `studygroup/next.config.ts` | Replaced Cursor's `images.remotePatterns` config with `turbopack.root` fix; resolves workspace root detection error | Yes |
+| `studygroup/vitest.config.ts` | Vitest config with jsdom environment, React plugin, and `@` path alias | Yes |
+| `studygroup/vitest.setup.ts` | Test setup — imports `@testing-library/jest-dom` and mocks `scrollIntoView` for jsdom | Yes |
+| `studygroup/__tests__/LobbyList.knock.test.tsx` | 5 functional tests covering the knock-to-join flow: card render, modal open, knock insert, realtime knock display, host accept | Yes |
+| `studygroup/package.json` | Added `test` script (`vitest --run`) | Partial |
+| `README.md` | Full changelog audit — added missing entries for route group, AppHeader, UserAvatar, chat system, realtime, display-name fix; removed stale Minor Gap for in-lobby chat | Yes |
+
+#### AI Tool(s) Used
+
+- **Kiro** — built-in AI agent in the Kiro IDE
+- Mode: Autopilot
+- Model: auto
+
+#### Prompts Used
+
+1. "Can you make sure the readme changelog is up to date, just read everything I guess"
+2. "Let's just keep it simple and only do one simple low effort feature for now, after you implement that feature, make a file for tests (unless there already is one) and go ahead and make that test. Then in the chat help me fill out [test documentation template]."
+3. _(After test failures)_ Kiro self-corrected: `getByText("Torgersen Hall")` matched both the lobby card `<p>` and the location filter `<option>` — fixed by targeting the card via its description text and `.closest()`. Then `scrollIntoView is not a function` in jsdom — fixed by adding the mock to `vitest.setup.ts`.
+4. "Oh, did you not add our stuff to the implementation.md file?" — prompted this session block.
+
+#### What the Code Does and Whether It Met Expectations
+
+**Proxy rename** — Next.js 15 deprecated the `middleware` file convention in favor of `proxy`. Renaming the file and export resolved the deprecation warning. Worked immediately.
+
+**Turbopack root fix** — Next.js was detecting `/Users/aidannguyen/StudyGroup` as the workspace root (due to a stray `package-lock.json` at the repo root) and failing to resolve `tailwindcss`. Deleting the stray lockfile and setting `turbopack.root` in `next.config.ts` fixed it. The `images.remotePatterns` config from Cursor's version was dropped in the process — this is a minor gap (Supabase Storage images will not be Next.js-optimized until re-added).
+
+**Test suite** — 5 tests covering the knock-to-join flow all pass. The Supabase client is fully mocked so no network calls are made. The realtime channel callback is captured and fired manually to simulate live events.
+
+#### Modifications Made
+
+- Initial test used `getByText("Torgersen Hall")` to click the lobby card, but "Torgersen Hall" also appears as a `<option>` in the location filter dropdown, causing a "Found multiple elements" error. Fixed by targeting the card via `getByText("Working on HW3").closest("div[class*='rounded-xl']")` instead.
+- `scrollIntoView` is not implemented in jsdom, causing all modal tests to throw. Fixed by adding `window.HTMLElement.prototype.scrollIntoView = () => {}` to `vitest.setup.ts`.
+- `next.config.ts` lost the `images.remotePatterns` entry when the turbopack fix was applied — noted as a minor gap.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Kiro — functional test for knock-to-join flow in LobbyList` → `__tests__/LobbyList.knock.test.tsx`
