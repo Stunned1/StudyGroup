@@ -1,3 +1,4 @@
+// AI-ASSISTED: Cursor — lobby list and active study-group chat modal interactions
 "use client";
  
 import { useState, useEffect, useRef } from "react";
@@ -108,6 +109,21 @@ export default function LobbyList({
     };
   }, [activeLobby?.id]);
  
+  useEffect(() => {
+    if (!activeLobby) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveLobby(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeLobby]);
+
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
