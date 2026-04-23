@@ -1,8 +1,13 @@
 // AI-GENERATED: Kiro — Supabase SSR middleware for auth-gated routing
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isOfflineDevModeEnabled } from "@/lib/dev-mode";
 
 export async function proxy(request: NextRequest) {
+  if (isOfflineDevModeEnabled()) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

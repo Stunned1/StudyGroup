@@ -28,15 +28,23 @@ export default function AppHeader({
   }, []);
 
   return (
-    <nav className="flex items-center justify-between bg-[#861F41] px-6 py-4 text-white">
-      <Link href="/lobbies" className="text-lg font-bold hover:opacity-90">
+    <nav className="sticky top-0 z-40 border-b border-white/10 bg-[#0b1220]/95 px-6 py-4 text-white backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
+      <Link href="/lobbies" className="text-lg font-bold text-pink-400 hover:opacity-90">
         StudyGroup
       </Link>
+      <div className="hidden min-w-[280px] flex-1 md:flex">
+        <input
+          type="text"
+          placeholder="Search courses or groups..."
+          className="w-full rounded-xl border border-white/10 bg-[#111827] px-4 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+        />
+      </div>
       <div className="flex items-center gap-4">
         {showNewLobby && (
           <Link
             href="/lobbies/new"
-            className="rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-[#861F41] hover:bg-gray-100"
+            className="rounded-lg bg-pink-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-pink-500"
           >
             + New Lobby
           </Link>
@@ -53,18 +61,18 @@ export default function AppHeader({
             <UserAvatar avatarUrl={avatarUrl} name={name} sizePx={40} />
           </button>
           {open && (
-            <div className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-lg border border-gray-200 bg-white py-1 text-sm shadow-lg">
+            <div className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-lg border border-white/10 bg-[#111827] py-1 text-sm shadow-lg">
               <Link
                 href="/profile"
-                className="block px-4 py-2 text-gray-800 hover:bg-gray-50"
+                className="block px-4 py-2 text-gray-100 hover:bg-white/5"
                 onClick={() => setOpen(false)}
               >
                 View profile
               </Link>
-              <form action="/api/auth/signout" method="post" className="border-t border-gray-100">
+              <form action="/api/auth/signout" method="post" className="border-t border-white/10">
                 <button
                   type="submit"
-                  className="w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-50"
+                  className="w-full px-4 py-2 text-left text-gray-100 hover:bg-white/5"
                 >
                   Sign out
                 </button>
@@ -72,6 +80,7 @@ export default function AppHeader({
             </div>
           )}
         </div>
+      </div>
       </div>
     </nav>
   );

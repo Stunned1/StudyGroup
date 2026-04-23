@@ -1,3 +1,4 @@
+// AI-ASSISTED: Cursor — login page with VT auth form
 "use client";
 
 import { useState } from "react";

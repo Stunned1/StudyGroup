@@ -1,6 +1,7 @@
 // AI-GENERATED: Cursor — shared shell for signed-in routes with profile avatar header
 // AI-ASSISTED: Cursor — profile select("*") and displayNameForUser when avatar_url or profile fetch fails
 import AppHeader from "@/components/AppHeader";
+import { isOfflineDevModeEnabled } from "@/lib/dev-mode";
 import { displayNameForUser } from "@/lib/display-name";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -10,6 +11,15 @@ export default async function AppShellLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  if (isOfflineDevModeEnabled()) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[#050914]">
+        <AppHeader name="Developer" avatarUrl={null} />
+        <div className="flex-1">{children}</div>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,7 +36,7 @@ export default async function AppShellLayout({
   const avatarUrl = profile?.avatar_url ?? null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-[#050914]">
       <AppHeader
         name={displayNameForUser(profile, user)}
         avatarUrl={avatarUrl}

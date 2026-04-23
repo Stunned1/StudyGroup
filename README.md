@@ -16,6 +16,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `DEV_OFFLINE_MODE` | Skips auth gating and Supabase user fetches in non-production so core UI can be developed while Supabase is paused |
 
 ### First-time setup
 
@@ -42,6 +43,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Added `turbopack.root` to `next.config.ts` to fix workspace root detection in monorepo-style folder
 - Added Vitest + React Testing Library (`vitest.config.ts`, `vitest.setup.ts`, `__tests__/LobbyList.knock.test.tsx`)
 - Added `test` script to `package.json`
+- Added dev-only `POST /api/dev/seed-lobbies` route to insert mock lobbies for the signed-in user
 
 **Auth**
 
@@ -51,6 +53,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Sign out API route
 - Profile page (`/profile`) — view name, major, year; edit major/year; upload profile photo to Supabase Storage with save/cancel flow
 - Signed-in shell: avatar dropdown with "View profile" and "Sign out"
+- Added dev offline mode (`DEV_OFFLINE_MODE=true`) to bypass auth gating and render app pages when Supabase is paused
 
 **Lobbies**
 
@@ -75,6 +78,8 @@ Find your study group — a location-based study session finder for Virginia Tec
 - `UserAvatar` component renders circular avatar with photo or initials fallback at any size
 - `ProfilePageClient` with avatar upload (tap to pick, save/cancel), major, and year fields
 - Circular avatars in the header and on lobby cards
+- Restyled signed-in shell and lobbies page with a dark dashboard look (hero banner, glass filters, high-contrast cards)
+- Refined lobby listing cards with stronger spacing, clearer metadata icons, and a larger amber Join Group CTA to match the target visual style
 
 **Bug Fixes**
 

@@ -297,3 +297,160 @@ Prompts were not logged during this session. Based on the `// AI-GENERATED: Curs
 #### AI Comment Markers Added
 
 - `// AI-GENERATED: Kiro — functional test for knock-to-join flow in LobbyList` → `__tests__/LobbyList.knock.test.tsx`
+
+---
+
+### Session 4 — Developer quick login bypass for local testing
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/api/auth/dev-bypass/route.ts` | Adds a dev-only POST route that signs in with env-provided test credentials and sets Supabase auth cookies | Yes |
+| `studygroup/app/login/page.tsx` | Adds optional "Use Developer Quick Login" button and handler behind env flag | Partial |
+| `README.md` | Documents new dev bypass environment variables and changelog entry | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "can we make a way to bypass our auth for developer purposes"
+2. Follow-up interpretation by agent: implement a safe local bypass that does not disable production auth and does not require exposing secret keys to the browser.
+
+#### What the Code Does and Whether It Met Expectations
+
+The new route (`/api/auth/dev-bypass`) is only available when `NODE_ENV !== "production"` and `DEV_AUTH_BYPASS_ENABLED=true`. It reads `DEV_AUTH_BYPASS_EMAIL` and `DEV_AUTH_BYPASS_PASSWORD` on the server and calls `supabase.auth.signInWithPassword`, which creates a normal Supabase session cookie. This preserves existing RLS behavior because requests still run as an authenticated user rather than bypassing authorization.
+
+The login page now shows a developer quick-login button only when `NEXT_PUBLIC_DEV_AUTH_BYPASS_ENABLED=true` (and not in production). Clicking it calls the new API route and, on success, navigates to `/lobbies`. This met expectations and keeps the bypass explicit, opt-in, and environment-gated.
+
+#### Modifications Made
+
+- Chose "quick login with dev credentials" instead of a true auth disable, because a full bypass would break RLS-dependent data access and increase risk of accidental insecure behavior.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — development-only quick login route using env-provided test credentials` → `studygroup/app/api/auth/dev-bypass/route.ts`
+- `// AI-ASSISTED: Cursor — login page with VT auth form and optional developer quick login trigger` → `studygroup/app/login/page.tsx`
+
+---
+
+### Session 5 — Offline dev mode when Supabase is paused
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/lib/dev-mode.ts` | Central helper for non-production offline mode flag and deterministic dev user id | Yes |
+| `studygroup/proxy.ts` | Skips auth redirect logic when offline dev mode is enabled | Partial |
+| `studygroup/app/(app)/layout.tsx` | Renders app shell with a placeholder developer identity instead of requiring Supabase auth | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Renders lobbies page with empty state + offline warning when Supabase is unavailable | Partial |
+| `studygroup/app/(app)/lobbies/new/page.tsx` | Renders create page in offline mode with warning and synthetic user id | Partial |
+| `studygroup/app/(app)/profile/page.tsx` | Renders offline warning instead of attempting profile queries | Partial |
+| `studygroup/app/login/page.tsx` | Removes prior quick-login button and restores normal login-only UI | Partial |
+| `README.md` | Replaces prior bypass env docs with `DEV_OFFLINE_MODE` documentation and changelog update | Partial |
+| Removed `studygroup/app/api/auth/dev-bypass/route.ts` | Deletes prior quick-login route that still depended on live Supabase auth | N/A |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok no, this sucks.... i meant this because soemtimes our supabase project will be paused but i still want to work on th project"
+2. Follow-up interpretation by agent: replace quick-login approach with a true local offline mode that does not require any live Supabase auth/session calls.
+
+#### What the Code Does and Whether It Met Expectations
+
+The previous quick-login bypass was removed because it still required Supabase authentication endpoints to be available. The new `DEV_OFFLINE_MODE` flow short-circuits proxy auth checks and server page user fetches in non-production, allowing navigation across app pages even when Supabase is paused.
+
+In offline mode, layout and pages render with clear warnings and synthetic local values rather than performing failing auth/profile queries. This met the requested behavior: keep working on project UI and page flows during Supabase downtime.
+
+#### Modifications Made
+
+- Replaced prior "dev quick login" implementation with "offline mode" after user feedback that Supabase can be paused and unavailable.
+- Kept safeguards by restricting offline behavior to non-production via environment checks.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — helpers for local offline development mode when Supabase is unavailable` → `studygroup/lib/dev-mode.ts`
+
+---
+
+### Session 6 — Dark dashboard UI refresh and Supabase mock seeding
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/api/dev/seed-lobbies/route.ts` | Dev-only endpoint that creates mock lobbies for the signed-in user | Yes |
+| `studygroup/components/LobbyList.tsx` | Adds dark card-based styling, seed button, and offline-aware behavior for local mocks | Partial |
+| `studygroup/components/AppHeader.tsx` | Restyles header to dark/glass dashboard style with search field | Partial |
+| `studygroup/app/(app)/layout.tsx` | Applies dark app background for signed-in shell | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Adds hero section and local mock lobby cards in offline mode | Partial |
+| `README.md` | Documents seed endpoint and UI refresh in changelog | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "can we try to make our new ui look more like this? can you autopopulate our supabase for mock entries?"
+2. Follow-up interpretation by agent: move toward a dark dashboard visual style and provide one-click dev seeding for realistic lobby cards.
+
+#### What the Code Does and Whether It Met Expectations
+
+The UI now follows a darker dashboard pattern on signed-in pages: glass-style header, hero area, darker filter panel, and elevated cards. The lobbies page in offline mode now renders local sample entries so visual iteration can continue when Supabase is paused.
+
+A new non-production endpoint (`/api/dev/seed-lobbies`) inserts realistic mock lobbies for the currently signed-in user and first removes prior `[MOCK]` lobbies by that same user. This enables one-click repopulation of data during development without affecting production.
+
+#### Modifications Made
+
+- Exported `LobbyRow` type from `LobbyList` so `lobbies/page.tsx` can provide typed local mock data in offline mode.
+- Added offline guards in `LobbyList` effects/actions to avoid unnecessary Supabase calls when `DEV_OFFLINE_MODE` is enabled.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: Cursor — development route that seeds mock lobbies for the signed-in user` → `studygroup/app/api/dev/seed-lobbies/route.ts`
+
+---
+
+### Session 7 — Lobby card visual parity pass
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Refines lobby listing card sizing, spacing, typography, metadata rows, and join CTA to better match the provided reference screenshot | Partial |
+| `README.md` | Adds changelog note for refined lobby card visual parity pass | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "notice how different the group listings look in the screenshot! this is how our group listings should look! can we change that?"
+2. "still broken"
+3. "do it"
+
+#### What the Code Does and Whether It Met Expectations
+
+This pass targets only the lobby listing cards in `LobbyList.tsx`. Card layout now has more breathing room, stronger hierarchy for title and subtitle, clearer metadata rows with icons, and a more prominent amber Join Group button. Mock labels are visually cleaner by stripping the `[MOCK]` prefix from displayed titles and subtitles while retaining underlying data.
+
+The changes met expectations for a closer visual match to the screenshot while preserving existing click/open behavior and chat modal flow.
+
+#### Modifications Made
+
+- Adjusted subtitle generation to avoid duplicate title/subtitle text that caused testing selector conflicts.
+- Kept test compatibility by preserving interaction structure and rerunning `LobbyList.knock.test.tsx` (pass).
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
