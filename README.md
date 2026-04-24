@@ -51,6 +51,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Browse page listing all open (non-expired) lobbies
 - Host profile picture shown on lobby cards when set
 - Filter lobbies by course ID and campus location
+- Added `All` / `My Lobbies` view toggle so users can quickly see lobbies they host or have joined
 - Create lobby form with course, location, description, max size, and duration
 - Join lobby button with full-lobby guard
 - Host can close (delete) their own lobby

@@ -187,3 +187,37 @@ No further modifications after implementation; `npm run build` succeeded.
 - `// AI-ASSISTED: Cursor — host avatar on cards; optional avatar_url when column missing from API` → `studygroup/components/LobbyList.tsx`
 
 ---
+
+### Session 4 — My Lobbies quick filter tab
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/lobbies/page.tsx` | Fetches current user's `lobby_members` rows and passes lobby IDs to the client list component | Partial |
+| `studygroup/components/LobbyList.tsx` | Adds `All` / `My Lobbies` toggle and filters cards to hosted or joined lobbies in My view | Partial |
+| `README.md` | Changelog entry describing the new quick-filter behavior | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Mode: Agent
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "something else thats simple but impactful"
+2. "can you implement this, and also give me a commit message"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobbies page now loads the signed-in user's membership rows from `lobby_members` and sends those lobby IDs to `LobbyList`. In the client UI, users can switch between `All` and `My Lobbies` without leaving the page. `My Lobbies` includes lobbies where the user is the host or is already a member. This met expectations for a low-effort, high-utility improvement by making it faster to find currently relevant sessions.
+
+#### Modifications Made
+
+- Initial implementation left existing lint failures in `LobbyList.tsx` (`no-explicit-any` and render purity for `Date.now()`).
+- Replaced untyped `any` access around `lobby_messages` with explicit local types and moved time calculations to a `nowMs` state refreshed on interval; `npm run lint` now passes.
+
+#### AI Comment Markers Added
+
+No new AI comment markers were added in this session because all modified files already contained existing AI attribution comments at the top.

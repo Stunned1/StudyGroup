@@ -21,10 +21,21 @@ export default async function LobbiesPage() {
     console.error("lobbies fetch:", lobbiesError.message);
   }
 
+  const { data: membershipRows, error: membershipError } = await supabase
+    .from("lobby_members")
+    .select("lobby_id")
+    .eq("user_id", user.id);
+
+  if (membershipError) {
+    console.error("membership fetch:", membershipError.message);
+  }
+
+  const myLobbyIds = new Set<string>((membershipRows ?? []).map((row) => row.lobby_id));
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <h2 className="mb-4 text-xl font-bold text-gray-800">Open Study Lobbies</h2>
-      <LobbyList lobbies={lobbies ?? []} userId={user.id} />
+      <LobbyList lobbies={lobbies ?? []} userId={user.id} myLobbyIds={[...myLobbyIds]} />
     </main>
   );
 }

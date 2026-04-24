@@ -1,6 +1,6 @@
 "use client";
  
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { VT_LOCATIONS } from "@/lib/types";
@@ -26,31 +26,87 @@ type Message = {
   created_at: string;
   profiles?: { name: string } | null;
 };
+
+type LobbyMessagesInsert = {
+  lobby_id: string;
+  user_id: string;
+  content: string;
+  type: "message" | "knock" | "accepted" | "declined";
+};
+
+type RealtimeInsertPayload = {
+  new: {
+    id: string;
+    lobby_id: string;
+    user_id: string;
+    content: string;
+    type: Message["type"];
+    created_at: string;
+  };
+};
+
+type LobbyMessagesApi = {
+  select: (query: string) => {
+    eq: (column: string, value: string) => {
+      order: (
+        column: string,
+        options: { ascending: boolean }
+      ) => Promise<{ data: Message[] | null }>;
+    };
+  };
+  insert: (values: LobbyMessagesInsert) => Promise<unknown>;
+};
+
+type RealtimeChannel = {
+  on: (
+    eventType: "postgres_changes",
+    filter: {
+      event: "INSERT";
+      schema: "public";
+      table: "lobby_messages";
+      filter: string;
+    },
+    callback: (payload: RealtimeInsertPayload) => Promise<void>
+  ) => RealtimeChannel;
+  subscribe: () => RealtimeChannel;
+};
  
 export default function LobbyList({
   lobbies,
   userId,
+  myLobbyIds,
 }: {
   lobbies: LobbyRow[];
   userId: string;
+  myLobbyIds: string[];
 }) {
   const supabase = createClient();
+  const lobbyMessagesApi = useMemo(
+    () => supabase.from("lobby_messages") as unknown as LobbyMessagesApi,
+    [supabase]
+  );
   const router = useRouter();
   const [courseFilter, setCourseFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
+  const [viewMode, setViewMode] = useState<"all" | "mine">("all");
   const [activeLobby, setActiveLobby] = useState<LobbyRow | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [userName, setUserName] = useState("");
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const messagesEndRef = useRef<HTMLDivElement>(null);
  
+  const myLobbyIdSet = new Set(myLobbyIds);
+
   const filtered = lobbies.filter((l) => {
+    const inMyLobbies = l.host_id === userId || myLobbyIdSet.has(l.id);
+    const matchViewMode = viewMode === "all" ? true : inMyLobbies;
     const matchCourse = courseFilter
       ? l.course_id.toLowerCase().includes(courseFilter.toLowerCase())
       : true;
     const matchLocation = locationFilter ? l.location === locationFilter : true;
-    return matchCourse && matchLocation;
+    return matchViewMode && matchCourse && matchLocation;
   });
  
   // Fetch current user's name
@@ -63,14 +119,13 @@ export default function LobbyList({
       .then(({ data }) => {
         if (data) setUserName(data.name);
       });
-  }, [userId]);
+  }, [supabase, userId]);
  
   // Load messages + subscribe to realtime when a lobby is opened
   useEffect(() => {
     if (!activeLobby) return;
  
-    (supabase as any)
-      .from("lobby_messages")
+    lobbyMessagesApi
       .select("*, profiles(name)")
       .eq("lobby_id", activeLobby.id)
       .order("created_at", { ascending: true })
@@ -78,7 +133,7 @@ export default function LobbyList({
         if (data) setMessages(data);
       });
  
-    const channel = supabase
+    const channel = (supabase
       .channel(`lobby:${activeLobby.id}`)
       .on(
         "postgres_changes",
@@ -88,7 +143,7 @@ export default function LobbyList({
           table: "lobby_messages",
           filter: `lobby_id=eq.${activeLobby.id}`,
         },
-        async (payload: any) => {
+        async (payload: RealtimeInsertPayload) => {
           const { data: profile } = await supabase
             .from("profiles")
             .select("name")
@@ -101,14 +156,18 @@ export default function LobbyList({
           ]);
         }
       )
-      .subscribe();
+      .subscribe()) as unknown as RealtimeChannel;
  
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [activeLobby?.id]);
+  }, [activeLobby, lobbyMessagesApi, supabase]);
  
-  
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNowMs(Date.now()), 30000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -116,7 +175,7 @@ export default function LobbyList({
   async function sendMessage() {
     if (!activeLobby || !input.trim()) return;
     setSending(true);
-    await (supabase as any).from("lobby_messages").insert({
+    await lobbyMessagesApi.insert({
       lobby_id: activeLobby.id,
       user_id: userId,
       content: input.trim(),
@@ -129,7 +188,7 @@ export default function LobbyList({
   async function sendKnock() {
     if (!activeLobby) return;
     setSending(true);
-    await (supabase as any).from("lobby_messages").insert({
+    await lobbyMessagesApi.insert({
       lobby_id: activeLobby.id,
       user_id: userId,
       content: `${userName} is knocking to join!`,
@@ -144,7 +203,7 @@ export default function LobbyList({
       ? `✅ ${msg.profiles?.name ?? "Someone"} was accepted!`
       : `❌ ${msg.profiles?.name ?? "Someone"} was declined.`;
  
-    await (supabase as any).from("lobby_messages").insert({
+    await lobbyMessagesApi.insert({
       lobby_id: activeLobby!.id,
       user_id: userId,
       content,
@@ -168,8 +227,34 @@ export default function LobbyList({
  
   return (
     <div>
+      {/* View mode tabs */}
+      <div className="mb-3 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setViewMode("all")}
+          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+            viewMode === "all"
+              ? "bg-[#861F41] text-white"
+              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("mine")}
+          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+            viewMode === "mine"
+              ? "bg-[#861F41] text-white"
+              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          My Lobbies
+        </button>
+      </div>
+
       {/* Filters */}
-      <div className="flex gap-3 mb-6">
+      <div className="mb-6 flex gap-3">
         <input
           type="text"
           placeholder="Filter by course (e.g. CS 3114)"
@@ -194,7 +279,9 @@ export default function LobbyList({
       {/* Lobby cards */}
       {filtered.length === 0 ? (
         <p className="text-gray-400 text-sm text-center py-12">
-          No open lobbies right now. Create one!
+          {viewMode === "mine"
+            ? "You have not hosted or joined any open lobbies yet."
+            : "No open lobbies right now. Create one!"}
         </p>
       ) : (
         <div className="flex flex-col gap-4">
@@ -204,7 +291,7 @@ export default function LobbyList({
             const expiresAt = new Date(lobby.expires_at);
             const minsLeft = Math.max(
               0,
-              Math.round((expiresAt.getTime() - Date.now()) / 60000)
+              Math.round((expiresAt.getTime() - nowMs) / 60000)
             );
  
             return (
