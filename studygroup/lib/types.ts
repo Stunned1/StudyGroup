@@ -30,6 +30,20 @@ export type LobbyMember = {
   joined_at: string;
 };
 
+export type ScheduledLobby = {
+  id: string;
+  host_id: string;
+  course_id: string;
+  location: string;
+  description: string | null;
+  max_size: number;
+  duration_minutes: number;
+  scheduled_for: string;
+  triggered: boolean;
+  triggered_at: string | null;
+  created_at: string;
+};
+
 export const VT_LOCATIONS = [
   "Torgersen Hall",
   "Newman Library",
