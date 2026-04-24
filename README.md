@@ -42,6 +42,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Added `turbopack.root` to `next.config.ts` to fix workspace root detection in monorepo-style folder
 - Added Vitest + React Testing Library (`vitest.config.ts`, `vitest.setup.ts`, `__tests__/LobbyList.knock.test.tsx`)
 - Added `test` script to `package.json`
+- Added login page test coverage for render, VT email validation, auth failure, and success redirect (`__tests__/LoginPage.test.tsx`)
 
 **Auth**
 
