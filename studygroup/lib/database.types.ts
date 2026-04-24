@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      scheduled_lobbies: {
+        Row: {
+          id: string
+          host_id: string
+          course_id: string
+          location: string
+          description: string | null
+          max_size: number
+          duration_minutes: number
+          scheduled_for: string
+          triggered: boolean
+          triggered_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          host_id: string
+          course_id: string
+          location: string
+          description?: string | null
+          max_size?: number
+          duration_minutes?: number
+          scheduled_for: string
+          triggered?: boolean
+          triggered_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          host_id?: string
+          course_id?: string
+          location?: string
+          description?: string | null
+          max_size?: number
+          duration_minutes?: number
+          scheduled_for?: string
+          triggered?: boolean
+          triggered_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_lobbies_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lobbies: {
         Row: {
           course_id: string
