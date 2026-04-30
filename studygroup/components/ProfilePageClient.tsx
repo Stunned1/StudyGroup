@@ -1,4 +1,5 @@
 // AI-GENERATED: Cursor — profile view with avatar upload (save/cancel) and major/year fields
+// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode profile settings surface styling
 "use client";
 
 import UserAvatar from "@/components/UserAvatar";
@@ -134,8 +135,8 @@ export default function ProfilePageClient({ profile }: Props) {
         onChange={onFileChange}
       />
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p className="mb-4 text-sm text-gray-500">
+      <section className="rounded-2xl border border-white/10 bg-[#111827] p-6 shadow-sm shadow-black/20">
+        <p className="mb-4 text-sm text-gray-400">
           Tap your photo to choose a new image, then Save or Cancel.
         </p>
         <div className="flex flex-col items-center gap-4">
@@ -151,7 +152,7 @@ export default function ProfilePageClient({ profile }: Props) {
                 type="button"
                 disabled={photoSaving}
                 onClick={() => void savePhoto()}
-                className="rounded-lg bg-[#861F41] px-4 py-2 text-sm font-semibold text-white hover:bg-[#6d1934] disabled:opacity-50"
+                className="rounded-lg bg-[#8b7bff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7968ff] disabled:opacity-50"
               >
                 {photoSaving ? "Saving…" : "Save photo"}
               </button>
@@ -159,48 +160,48 @@ export default function ProfilePageClient({ profile }: Props) {
                 type="button"
                 disabled={photoSaving}
                 onClick={cancelPhoto}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-lg border border-white/10 bg-[#0b1220] px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-white/10 disabled:opacity-50"
               >
                 Cancel
               </button>
             </div>
           )}
           {photoMsg && (
-            <p className="text-center text-sm text-red-600">{photoMsg}</p>
+            <p className="text-center text-sm text-red-300">{photoMsg}</p>
           )}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-white/10 bg-[#111827] p-6 shadow-sm shadow-black/20">
         <dl className="space-y-4">
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
               Name
             </dt>
-            <dd className="mt-1 text-lg font-semibold text-gray-900">{profile.name}</dd>
+            <dd className="mt-1 text-lg font-semibold text-gray-100">{profile.name}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
               Major
             </dt>
             <dd className="mt-1">
               <input
                 value={major}
                 onChange={(e) => setMajor(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+                className="w-full rounded-lg border border-white/10 bg-[#0b1220] px-3 py-2 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
                 placeholder="e.g. Computer Science"
               />
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
               Year
             </dt>
             <dd className="mt-1">
               <input
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-[#861F41]"
+                className="w-full rounded-lg border border-white/10 bg-[#0b1220] px-3 py-2 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
                 placeholder="e.g. Junior"
               />
             </dd>
@@ -210,11 +211,11 @@ export default function ProfilePageClient({ profile }: Props) {
           type="button"
           disabled={profileSaving}
           onClick={() => void saveProfileFields()}
-          className="mt-6 rounded-lg bg-[#861F41] px-4 py-2 text-sm font-semibold text-white hover:bg-[#6d1934] disabled:opacity-50"
+          className="mt-6 rounded-lg bg-[#8b7bff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7968ff] disabled:opacity-50"
         >
           {profileSaving ? "Saving…" : "Save profile"}
         </button>
-        {profileMsg && <p className="mt-2 text-sm text-gray-600">{profileMsg}</p>}
+        {profileMsg && <p className="mt-2 text-sm text-gray-400">{profileMsg}</p>}
       </section>
     </div>
   );

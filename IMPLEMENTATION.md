@@ -329,3 +329,1037 @@ The new test file mocks `next/navigation` and the Supabase browser client so log
 #### AI Comment Markers Added
 
 - `// AI-GENERATED: Cursor — functional tests for login page validation and auth flow` → `studygroup/__tests__/LoginPage.test.tsx`
+
+---
+
+### Session 4 — Unit tests for display-name fallbacks
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/lib/display-name.test.ts` | Unit tests for `displayNameForUser` fallback chain: profile name → metadata name → email local-part → `"Student"` | Yes |
+| `README.md` | Adds changelog entry for new unit test coverage | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "Generate unit tests for the function(s) implemented for PM4 (at least one unit test per function, and at least one integration test incorporating multiple functions working together)."
+2. "can you generate at least one test please"
+
+#### What the Code Does and Whether It Met Expectations
+
+The new test file validates the fallback behavior in `displayNameForUser`, including all expected branches: profile name precedence, metadata fallback, email local-part fallback, and the final `"Student"` default. Tests passed in Vitest (`2 test files`, `9 tests` passing total), meeting the request for at least one generated test with course-policy prompt attribution included in the test file header.
+
+#### Modifications Made
+
+- Added explicit prompt log comments at the top of `display-name.test.ts` to satisfy course AI policy documentation.
+
+#### AI Comment Markers Added
+
+- `/** AI-GENERATED: Cursor (Codex 5.3) — unit tests for display name fallback logic */` → `studygroup/lib/display-name.test.ts`
+
+---
+
+### Session 5 — Sidebar shell with profile settings navigation
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Refactors the signed-in shell navigation from a top header into a left sidebar with lobby links, profile settings access, and sign-out action | Partial |
+| `studygroup/app/(app)/layout.tsx` | Updates signed-in layout structure to render the sidebar column beside page content | Partial |
+| `README.md` | Adds changelog entry documenting the sidebar and profile settings navigation update | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok. can you make it so theres a sidebar instead, and then tuck the profile settings into that sidebar"
+
+#### What the Code Does and Whether It Met Expectations
+
+The shared signed-in shell now renders a responsive maroon sidebar instead of a top navigation bar. The sidebar includes quick links for open lobbies and creating new lobbies, and it contains a dedicated "Profile settings" section with avatar/name context and a direct link to `/profile`. Sign-out is also moved into the sidebar footer. This behavior matched the request and passed the existing Vitest suite (`9/9` tests passing).
+
+#### Modifications Made
+
+- The original sign-out button logic from the header dropdown was adapted into a sidebar footer form submit action.
+- A follow-up test command was run using `npm --prefix "/Users/aidannguyen/StudyGroup/studygroup" run test` after a workspace-level npm resolution issue when running `npm run test` from the wrong package root.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: Cursor (Codex 5.3) — responsive app sidebar with lobby navigation and profile settings access` → `studygroup/components/AppHeader.tsx`
+
+---
+
+### Session 6 — Blended sidebar and top header shell
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Adds a top header that visually blends with the maroon sidebar and includes a global search bar plus top-right profile avatar link | Partial |
+| `studygroup/components/AppHeader.tsx` | Simplifies sidebar content to focus on app navigation and moves profile emphasis into the top header | Partial |
+| `README.md` | Adds changelog entry documenting the blended sidebar/header shell and new search/avatar header controls | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok the sidebar should blend into a header. the header should have a profile picture on the top right and a search bar"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in app shell now has both structures requested: a persistent left sidebar and a matching top maroon header that feels visually connected to the sidebar. The header includes a search input (submitted to `/lobbies` via query string) and a profile avatar/name shortcut on the top right that links to profile settings. This met the requested layout update and passed the existing test suite (`9/9` tests passing).
+
+#### Modifications Made
+
+- Removed duplicated profile-settings blocks from the sidebar once the top-right profile control was introduced in the header, to keep navigation concise.
+- Kept sign-out in the sidebar footer so account actions remain discoverable even when content pages scroll.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 7 — Modern dashboard visual refresh
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Restyles sidebar to a modern light dashboard nav with active-route highlighting and cleaner account footer card | Partial |
+| `studygroup/app/(app)/layout.tsx` | Restyles top shell and search header with softer surfaces, rounded search input, and refined profile shortcut | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Updates lobbies page wrapper and heading/subheading spacing for dashboard-like content framing | Partial |
+| `studygroup/components/LobbyList.tsx` | Refreshes filter panel and lobby cards with modern spacing, soft borders, and cleaner status chip styling; adds stable test id per card | Partial |
+| `studygroup/__tests__/LobbyList.knock.test.tsx` | Replaces class-based card selectors with `data-testid` selectors to keep tests stable after UI class refactors | Partial |
+| `README.md` | Adds changelog note for the modern UI refresh | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "can we make it look a bit more like this? nice, clean, and modern"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in experience now resembles a cleaner dashboard aesthetic: light sidebar, understated top bar with rounded search, softer background tones, and cleaner card presentation in lobby browsing. Existing behavior (filters, modal chat, knock-to-join) remains unchanged while visual hierarchy and spacing are improved. After adapting tests to use stable card identifiers rather than CSS class matching, the suite passed (`9/9` tests).
+
+#### Modifications Made
+
+- Initial UI restyle changed card class names and broke tests that relied on `.closest("div[class*='rounded-xl']")`.
+- Added `data-testid` to lobby cards and updated tests to target that stable selector.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: Cursor (Codex 5.3) — modernized clean sidebar styling with active nav state` → `studygroup/components/AppHeader.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — clean modern shell styling for sidebar + top search header` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — dashboard-style lobbies page container and heading polish` → `studygroup/app/(app)/lobbies/page.tsx`
+
+---
+
+### Session 8 — Fix refresh-to-dark theme regression
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/globals.css` | Removes automatic dark-mode media query override so the refreshed UI keeps the intended light dashboard theme after reload | Partial |
+| `README.md` | Adds changelog bug-fix entry for the refresh-to-black regression | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "it looked good, but when i refreshed it all turned black?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The global CSS originally switched `--background` and `--foreground` based on `prefers-color-scheme: dark`, which overrode the new light dashboard shell on refresh for users with dark-mode system settings. Removing that media query keeps the app consistently in the chosen light style and resolves the black-background regression. Tests passed afterward (`9/9`).
+
+#### Modifications Made
+
+- No additional code changes were needed beyond removing the global dark-mode override.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 9 — Full dark-mode transition for shell and lobbies
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/globals.css` | Sets global background/foreground tokens to dark values so app defaults to dark mode consistently | Partial |
+| `studygroup/components/AppHeader.tsx` | Converts sidebar nav and account footer to dark surfaces with accessible text contrast and active states | Partial |
+| `studygroup/app/(app)/layout.tsx` | Converts app shell and top search header to dark-mode surfaces and dark input styling | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Adjusts headings/subtext colors for dark readability | Partial |
+| `studygroup/components/LobbyList.tsx` | Converts filters, cards, empty state, and chat modal to dark theme styling while preserving behavior | Partial |
+| `README.md` | Adds changelog item for dark-mode transition | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "nope it still happens. honestly though, lets get rid of light mode completely and fully transition to dark mode."
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in layout now renders with a consistent dark palette by default, including sidebar, top header/search, lobby filtering panel, lobby cards, and lobby chat modal. This removes mixed light/dark behavior after reload and aligns with a dark-mode-only direction for the main logged-in experience. Existing functional behavior remained unchanged, and tests passed (`9/9`).
+
+#### Modifications Made
+
+- Updated visual token usage from light backgrounds (`bg-white`, `bg-[#f7f8fc]`) to dark surfaces and increased text contrast to keep readability.
+
+#### AI Comment Markers Added
+
+- `/* AI-ASSISTED: Cursor (Codex 5.3) — global dark theme tokens for full app transition */` → `studygroup/app/globals.css`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — full dark-mode sidebar styling and navigation surfaces` → `studygroup/components/AppHeader.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — full dark-mode shell with dark search/header surfaces` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — dark-mode page typography and contrast updates` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — dark-mode lobby list cards, filters, and modal surfaces` → `studygroup/components/LobbyList.tsx`
+
+---
+
+### Session 10 — Header notifications button for demo UX
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Adds a notifications bell button with unread dot indicator in the signed-in top header next to the profile shortcut | Partial |
+| `README.md` | Adds UI changelog note for the new header notifications affordance | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok lets remember this is for a hackathon so lets optimize the demo and seed a bunch of random stuff! just keep that in mind. anyways, lets continue, for now lets add a notifications button in the header"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in header now includes a dedicated notifications button (bell icon) with a small indicator dot, styled to match the dark dashboard shell. This improves perceived product completeness during demos while preserving existing profile and search interactions. The update met the request and all tests passed (`9/9`).
+
+#### Modifications Made
+
+- No follow-up fixes were needed after implementation.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: Cursor (Codex 5.3) — adds header notifications button for demo-ready shell` → `studygroup/app/(app)/layout.tsx`
+
+---
+
+### Session 11 — Notifications visibility fix after refresh
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Fixes top-header flex layout so the right-side controls (notifications + profile) stay visible while search shrinks first on constrained widths | Partial |
+| `README.md` | Adds bug-fix changelog entry documenting notifications visibility regression fix | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "the notifications button disappeared when i refreshed the page?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The notifications button existed in code but could be visually pushed out in certain width/layout states because the search form consumed available flex space. The header now uses `min-w-0 flex-1` for the search form and `flex-shrink-0 ml-auto` for the right controls, ensuring notifications remain visible after refresh and across tighter viewport widths. Tests passed (`9/9`).
+
+#### Modifications Made
+
+- No additional modifications were needed after updating header flex constraints.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 12 — Harden notifications visibility for demos
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Replaces icon-only notifications button with a high-contrast `Alerts` pill (`🔔` + unread count badge) so the control remains visibly obvious across refresh/browser rendering states | Partial |
+| `README.md` | Adds bug-fix changelog note for notifications visibility hardening | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "yea i dont know why nothing is working"
+
+#### What the Code Does and Whether It Met Expectations
+
+The header now uses a text-backed notifications affordance rather than relying on a subtle icon stroke. This significantly reduces the chance of the control appearing to vanish due to rendering quirks or contrast issues, which is important for hackathon demos where reliability and legibility matter more than minimalism. The change met expectations and tests remained green (`9/9`).
+
+#### Modifications Made
+
+- Shifted from SVG-only bell icon treatment to explicit text+emoji+badge visual structure to maximize visibility.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 13 — Fix header squish on refresh/resizing
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Reworks top header into a resilient two-column grid with responsive paddings and breakpoint-based label visibility to prevent controls from collapsing/squishing on refresh | Partial |
+| `README.md` | Adds bug-fix changelog note for the header squish regression | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok its because whenever i refresh the page, the header might think my window is smaller than it is? it looks great when you first implement it, but then it all gets squished to the side"
+
+#### What the Code Does and Whether It Met Expectations
+
+The header previously depended on a single flex row where content could become brittle near viewport breakpoints, making controls appear squished after refresh/resizing. The layout now uses `grid-cols-[minmax(0,1fr)_auto]`, responsive horizontal paddings, and stricter label visibility breakpoints (`Alerts` on `md+`, profile name on `xl+`) so the search region compresses safely while right controls remain stable. This behavior matches the expected resilient demo UI and tests still pass (`9/9`).
+
+#### Modifications Made
+
+- Replaced flex-based row sizing with grid-based sizing to reduce edge-case shrink behavior.
+- Adjusted header/content paddings to be responsive (`px-4 sm:px-6 lg:px-8`) to avoid horizontal crowding.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 14 — Structural header width analysis and hardening
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Applies structural width fix based on layout analysis: responsive sidebar width (`w-56` to `xl:w-64`) and explicit 3-column header grid (`search`, `notifications`, `profile`) so controls cannot be compressed into each other | Partial |
+| `README.md` | Adds changelog note for structural anti-squash header fix | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok wait. do a whole code analysis to see why these two are being squashed. theres no solid fix right now"
+
+#### What the Code Does and Whether It Met Expectations
+
+Code analysis identified the main source as compounding horizontal constraints: fixed sidebar width + shell paddings + search + two right controls in a shared cluster. A purely cosmetic fix was not enough because near-edge viewport calculations after refresh could still compress the right side unpredictably. The final update uses structural constraints (separate grid tracks for notifications and profile, responsive sidebar width, and tighter label visibility rules) to guarantee right controls remain visible and stable. This met expectations and preserved behavior with tests passing (`9/9`).
+
+#### Modifications Made
+
+- Notifications control was changed back to a compact fixed-width icon button so it occupies a predictable column width.
+- Profile display name visibility is now delayed to `2xl` to avoid width contention at common laptop resolutions.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 15 — Header grid fallback fix
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Fixes header controls stacking by defining `gridTemplateColumns` inline (`minmax(0,1fr) auto auto`) so search/notifications/profile stay on one row after refresh | Partial |
+| `README.md` | Adds bug-fix changelog note for stacked-header regression | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "ok... whats happening now?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The screenshot showed the header controls rendered on three stacked rows, indicating the header grid template columns were not consistently applying at runtime and the grid was falling back to a single column. By pinning `grid-template-columns` directly on the header row container, the search field and right-side controls now remain in a deterministic three-column layout regardless of stylesheet timing/caching quirks after refresh. This matched expectations and tests stayed green (`9/9`).
+
+#### Modifications Made
+
+- Replaced Tailwind arbitrary grid-template utility usage for this container with inline style to remove dependency on generated class resolution in this critical layout path.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this session.
+
+---
+
+### Session 16 — GroupHub-style light shell layout
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Restyles sidebar to a light GroupHub-inspired look with cleaner typography, softer borders, and modern active nav treatment | Partial |
+| `studygroup/app/(app)/layout.tsx` | Restyles top header to a light dashboard style with rounded search bar, notifications button, settings button, and profile pill | Partial |
+| `README.md` | Adds UI changelog entry documenting the GroupHub-style shell transition | Partial |
+
+#### AI Tool(s) Used
+
+- **Cursor** — agent chat
+- Model: Codex 5.3
+
+#### Prompts Used
+
+1. "alright! now lets try to use this type of layout!"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in shell now visually follows the provided reference direction: a light sidebar with clear information hierarchy and a clean top header containing a rounded search input plus compact right-side actions (notifications, settings, profile). The layout remains functional and stable after prior grid fixes, and test coverage remains green (`9/9`).
+
+#### Modifications Made
+
+- Adjusted the header grid template to support four columns (`search`, `notifications`, `settings`, `profile`) after introducing the settings control.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: Cursor (Codex 5.3) — GroupHub-style light sidebar refresh` → `studygroup/components/AppHeader.tsx`
+- `// AI-ASSISTED: Cursor (Codex 5.3) — GroupHub-style light top header with icon actions` → `studygroup/app/(app)/layout.tsx`
+
+---
+
+### Session 17 — Dark-mode UI restoration and profile settings nav cleanup
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Restores dark signed-in shell/header styling and removes the standalone settings icon from the top header | Partial |
+| `studygroup/components/AppHeader.tsx` | Restores dark sidebar styling and removes the separate `Profile settings` sidebar tab | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Keeps lobbies page heading contrast aligned with the dark app shell | Partial |
+| `studygroup/app/(app)/lobbies/new/page.tsx` | Updates create-lobby page wrapper heading for dark mode | Partial |
+| `studygroup/app/(app)/profile/page.tsx` | Updates profile page wrapper heading for dark mode | Partial |
+| `studygroup/components/NewLobbyForm.tsx` | Converts create-lobby form controls and card surface to dark mode | Partial |
+| `studygroup/components/ProfilePageClient.tsx` | Converts profile settings cards, inputs, and actions to dark mode | Partial |
+| `studygroup/app/login/page.tsx` | Converts login screen to dark mode | Partial |
+| `studygroup/app/signup/page.tsx` | Converts signup screen to dark mode | Partial |
+| `README.md` | Adds UI changelog bullets for the dark-mode restoration and profile settings nav cleanup | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: agent implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "Ok! our whole thing is UI/UX [$developer-phase-implementer] ... first, lets make the whole transition into dark mode. can you go ahead and do that for me? also the profile settings in the sidebar to the left SHOULDN'T be there as a separate tab. you should be able to set that when you actually click into your profile"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in shell now uses a consistent dark palette again: dark page background, dark sidebar, dark top header, dark search input, dark notifications control, and dark profile pill. The standalone sidebar `Profile settings` tab was removed so the left navigation only contains lobby navigation. Profile editing remains available through the top-right profile/avatar link and the account card in the sidebar footer, which both route to `/profile`.
+
+The auth screens, create-lobby form, and profile settings cards were also converted from light cards/inputs to dark surfaces so the app no longer switches between light and dark UI across core routes. Existing lobby behavior was left unchanged.
+
+#### Modifications Made
+
+- Removed the top-header settings icon because profile editing is now intentionally accessed from the profile entry point rather than a separate settings control.
+- Kept the sidebar footer profile/account card as a profile entry point, not as a separate navigation tab.
+- `npm run lint` was attempted but is blocked by pre-existing lint issues in `LobbyList.tsx` and `__tests__/LobbyList.knock.test.tsx` (`any` usage, hook dependency warnings, and a `Date.now()` render-purity error). No lint cleanup was included in this UI phase.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — restores dark app shell and keeps profile settings inside the profile page` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark sidebar navigation without a separate profile settings tab` → `studygroup/components/AppHeader.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — keeps lobbies page typography aligned with the dark app shell` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode create lobby page wrapper` → `studygroup/app/(app)/lobbies/new/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode profile page wrapper for in-profile settings` → `studygroup/app/(app)/profile/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode create lobby form styling` → `studygroup/components/NewLobbyForm.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode profile settings surface styling` → `studygroup/components/ProfilePageClient.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode login screen styling` → `studygroup/app/login/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode signup screen styling` → `studygroup/app/signup/page.tsx`
+
+---
+
+### Session 18 — Modern dark header and SVG icon cleanup
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Refines the dark top header to match the provided modern reference spacing with a large search pill, SVG search icon, SVG notification icon, SVG settings icon, and avatar action | Partial |
+| `studygroup/components/LobbyList.tsx` | Replaces visible lobby-card/chat emoji affordances with inline SVG icons for open-arrow, knock, accepted, declined, and close actions | Partial |
+| `studygroup/__tests__/LobbyList.knock.test.tsx` | Updates knock-flow assertions to match the new SVG-backed `Knock to join` button text | Partial |
+| `README.md` | Adds UI changelog note for the modern dark header and SVG-only action icons | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: agent implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can we make the header look a bit more like this? not with the light mode of course, but kinda the same modern layout and spacing? also remove all emojis and replace them with SVG's if possible?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in top header now follows the supplied reference more closely while staying dark: the search control is a wider rounded pill with a leading SVG search icon, the right side uses compact SVG notification/settings actions, and the avatar is visually separated as the profile entry point. The settings icon links to `/profile`, so profile editing still happens from the profile surface rather than a separate sidebar tab.
+
+Visible app emoji affordances in the lobby UI were replaced with inline SVGs: open lobby arrow, knock icon, accepted/declined status icons, and chat close icon. A targeted scan of `studygroup/app`, `studygroup/components`, and `studygroup/__tests__` found no remaining removed emoji glyphs.
+
+#### Modifications Made
+
+- Updated knock-flow tests from the old emoji-prefixed `"🚪 Knock to join"` assertion to the SVG-backed `"Knock to join"` text.
+- Kept existing lobby behavior unchanged; only visual/icon rendering and corresponding test text changed.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — modern dark header spacing with SVG search and action icons` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — replaces lobby chat emoji affordances with inline SVG icons` → `studygroup/components/LobbyList.tsx`
+
+---
+
+### Session 19 — Header refresh layout regression fix
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Replaces the flex-based modern header row with explicit search/action grid columns and inline critical search padding so refresh cannot stretch the search input over the action icons | Partial |
+| `README.md` | Adds bug-fix changelog entry for the modern header refresh regression | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: agent implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "what changed? why does the header look like this? i refreshed and this is what I got"
+
+#### What the Code Does and Whether It Met Expectations
+
+The prior header update used a flex row where the search form could consume nearly the entire header after refresh, causing the action icons to be crowded or visually displaced and making the search icon/placeholder alignment look wrong. The fix pins the header to two explicit columns: a capped search column (`minmax(0, 720px)`) and a right-side action column. The search icon left offset and input padding are now inline for this critical layout path, matching the same defensive approach previously used for header grid stability.
+
+#### Modifications Made
+
+- Kept the dark reference-inspired layout, but replaced the unstable `flex-1` search sizing with an explicit grid template.
+- Preserved the SVG-only action icons and profile/avatar links from Session 18.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — pins header search/action columns to prevent refresh-time stretching` → `studygroup/app/(app)/layout.tsx`
+
+---
+
+### Session 20 — Traditional college schedule timetable
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/ScheduleCalendar.tsx` | Replaces the schedule day-card layout with a traditional college timetable: weekday columns, time rows, half-hour grid lines, and class blocks spanning start/end times | Partial |
+| `README.md` | Adds UI changelog note for the traditional schedule layout | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: agent implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you make the calendar(schedule in sidebar) look like the actual traditional college schedule?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The schedule route now renders a traditional timetable rather than separate daily cards. The grid shows weekdays across the top, times down the left side from 8 a.m. through 7 p.m., half-hour grid lines, and class blocks positioned by `day_of_week`, `start_time`, and `end_time`. Class blocks use the selected class color, show class name, time, and optional location, and retain delete controls through an SVG button on hover/focus.
+
+The add-class form remains in the right panel and now uses weekday options only, matching the Monday-through-Friday reference image and the normal college weekly schedule model.
+
+#### Modifications Made
+
+- Added schedule time-grid helpers for converting time strings to CSS grid rows.
+- Preserved the existing Supabase insert/delete behavior and setup-error disabled state.
+- Replaced the old per-day card list with a horizontally scrollable timetable so the layout remains usable on narrower screens.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — traditional college timetable grid with time rows and weekday columns` → `studygroup/components/ScheduleCalendar.tsx`
+
+---
+
+### Session 21 — Refresh-stable shell and schedule CSS
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Replaces fragile header/shell utility combinations with stable named CSS classes for the app shell, header grid, search input, action buttons, and content padding | Partial |
+| `studygroup/components/ScheduleCalendar.tsx` | Replaces fragile schedule grid utility combinations with stable named CSS classes for the timetable, cells, headings, and class blocks | Partial |
+| `studygroup/app/globals.css` | Adds browser-stable shell/header/search/schedule CSS, including `input[type="search"]` appearance reset for Safari-like search input rendering | Partial |
+| `README.md` | Adds bug-fix changelog entry for refresh-stable layout CSS | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: review-guided implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you make these fixes? [$review-agent] [$developer-phase-implementer]"
+
+#### What the Code Does and Whether It Met Expectations
+
+Review identified the refresh-only visual drift as code fragility rather than a Safari-only issue: critical layouts mixed flex growth, Tailwind arbitrary values, and browser-native search input styling. The implementation keeps the same intended dark UI but moves the shell/header/search/schedule geometry into stable global CSS classes. The search input now has an explicit `appearance: none` reset and disabled WebKit search decorations so Safari refreshes render the same input box and icon spacing.
+
+The schedule timetable also now uses stable named classes for its grid cells, headers, time labels, and class blocks, reducing dependence on generated arbitrary utility classes in the main visual surface.
+
+#### Modifications Made
+
+- Replaced the app shell/header markup classes with `app-*` CSS classes.
+- Replaced the schedule timetable structural classes with `schedule-*` CSS classes.
+- Added media queries for narrower widths so the search/action columns remain explicit without stretching into each other.
+- `npm run lint` was attempted but remains blocked by pre-existing `LobbyList.tsx` and `__tests__/LobbyList.knock.test.tsx` lint issues (`any` usage, hook dependency warnings, and `Date.now()` in render).
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — uses stable shell/header CSS classes to prevent refresh-only layout drift` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — uses stable schedule CSS classes for refresh-safe timetable layout` → `studygroup/components/ScheduleCalendar.tsx`
+- `/* AI-ASSISTED: ChatGPT (GPT-5) — stable app shell, header, search, and schedule layout classes */` → `studygroup/app/globals.css`
+
+---
+
+### Session 22 — Emergency shell layout rollback
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/(app)/layout.tsx` | Removes dependency on custom `.app-*` shell/header classes and restores the known working Tailwind utility shell with inline critical SVG/search sizing | Partial |
+| `studygroup/components/ScheduleCalendar.tsx` | Removes dependency on custom schedule layout classes and restores utility-based timetable structure with inline grid templates | Partial |
+| `studygroup/app/globals.css` | Removes the broken `.app-*` and `.schedule-*` custom layout class blocks, keeping only the search input reset | Partial |
+| `README.md` | Corrects the changelog to describe the rollback of the broken custom shell class approach | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: emergency regression fix after visual review
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "everything is soooo messed up right now.. holy"
+
+#### What the Code Does and Whether It Met Expectations
+
+The previous attempt moved critical app shell and header layout into custom global CSS classes. In the user's browser session those classes were not applied, which caused the sidebar/header/content to fall back into normal document flow and allowed SVG icons to render at huge intrinsic sizes. This rollback restores the known working Tailwind utility-based shell/header structure and pins only the fragile SVG dimensions/search padding inline, so missing custom shell classes cannot collapse the app again.
+
+The schedule timetable also no longer depends on custom `.schedule-*` classes. It uses the utility-based structure plus inline CSS grid templates, matching the approach that compiles and renders through the existing app styling path.
+
+#### Modifications Made
+
+- Removed custom `.app-*` shell/header class usage from `layout.tsx`.
+- Added inline `width`/`height` to header SVG icons as a guardrail.
+- Removed custom `.app-*` and `.schedule-*` layout CSS from `globals.css`.
+- Restored schedule markup to utility classes while keeping the traditional timetable layout.
+
+#### AI Comment Markers Added
+
+- No new AI comment markers were added in this emergency rollback; the existing Session 21 markers remain in file history but the implementation no longer depends on those custom classes.
+
+---
+
+### Session 23 — Schedule repeat tabs
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/ScheduleCalendar.tsx` | Replaces the repetitive repeat preset + weekday controls with Daily and Custom tabs; Custom reveals Notion-style weekday chips | Partial |
+| `README.md` | Adds UI changelog note for the simplified schedule repeat controls | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: frontend implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "the repeats in the way you add classes is really ugly. there should be two tabs i think! a way to set things for daily, or custom? I sent an image of how notion does it and it looks really good"
+
+#### What the Code Does and Whether It Met Expectations
+
+The add-class form now has a compact segmented repeat control with two modes: Daily and Custom. Daily selects every weekday from Monday through Friday and shows a short summary instead of extra buttons. Custom reveals circular weekday chips styled after the supplied Notion reference, so users only see the detailed day picker when they need it.
+
+The database behavior remains the same: the form still inserts one `schedule_classes` row per selected weekday. The change is limited to local form state and presentation.
+
+#### Modifications Made
+
+- Removed the visible MWF/TR/MW/Daily preset row because it duplicated the weekday picker and made the form feel cluttered.
+- Added repeat-mode state so switching back to Daily reliably selects all weekdays.
+- Reset the repeat mode to Daily after a successful class insert.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — simplifies class repeats into daily and custom tabs` → `studygroup/components/ScheduleCalendar.tsx`
+
+---
+
+### Session 24 — Visible schedule class deletion
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/ScheduleCalendar.tsx` | Makes schedule deletion visible with always-shown timetable trash buttons and a side-panel class list with delete actions | Partial |
+| `README.md` | Adds UI changelog note for visible schedule delete controls | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused UI implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "we also have to add a way to delete classes!!"
+
+#### What the Code Does and Whether It Met Expectations
+
+Schedule classes can already be deleted through the existing Supabase delete handler, but the affordance was hidden until hover/focus on a class block. The UI now makes deletion obvious: each timetable block has a visible trash control, and the add-class side panel includes a `Your classes` list with one delete button per scheduled block.
+
+Both delete entry points call the same existing `schedule_classes` delete mutation scoped by `id` and `user_id`, then refresh the route. This keeps the behavior consistent and avoids changing the database model.
+
+#### Modifications Made
+
+- Added `deletingId` state so delete buttons can be disabled while a delete request is in flight.
+- Added a small day-label helper for the side-panel class list.
+- Replaced the hover-only delete button treatment with an always-visible trash control.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — makes schedule class deletion visible from blocks and side list` → `studygroup/components/ScheduleCalendar.tsx`
+
+---
+
+### Session 25 — Remove sidebar new lobby action
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Removes the `+ New lobby` link from the primary sidebar navigation | Partial |
+| `README.md` | Adds UI changelog note for the sidebar navigation simplification | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused UI implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "remove the + New Lobby button on the sidebar. I dont think that's needed"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in sidebar now only shows `Open lobbies` and `Schedule` in the primary navigation. The dedicated `+ New lobby` sidebar entry was removed so the left rail is simpler and less action-heavy.
+
+No routing or lobby creation logic was deleted; this change only removes the sidebar navigation affordance.
+
+#### Modifications Made
+
+- Removed the `/lobbies/new` `Link` from `AppHeader`.
+- Left the rest of the sidebar account/profile/sign-out structure unchanged.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes new lobby from the primary sidebar navigation` → `studygroup/components/AppHeader.tsx`
+
+---
+
+### Session 26 — Demo lobby seeding
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/api/demo/seed-lobbies/route.ts` | Authenticated API route that inserts realistic premade open lobbies for the signed-in user while avoiding duplicate active seed rows | Yes |
+| `studygroup/app/(app)/lobbies/page.tsx` | Passes a sparse-data flag to the lobby list so the demo seed prompt appears only when useful | Partial |
+| `studygroup/components/LobbyList.tsx` | Adds a `Seed demo lobbies` control to the filter panel and refreshes the page after seeding | Partial |
+| `README.md` | Adds changelog note for demo lobby seeding | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "since this is going to be built out for a demo, can we seed the open lobbies with premade lobbies.. idk we need a way for this to look nice and demoable"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby page now supports demo seeding without requiring manual Supabase SQL edits. When fewer than six open lobbies are available, the filter panel shows a `Seed demo lobbies` button. Clicking it calls an authenticated API route that inserts six realistic Virginia Tech study sessions using the signed-in user as `host_id`, which keeps the insert compatible with existing row-level security.
+
+The seeded rows use existing app locations so the location filter continues to work. The endpoint checks for matching active seed rows for the current host before inserting, so repeated clicks do not keep duplicating the same demo lobbies.
+
+#### Modifications Made
+
+- Chose an authenticated in-app seed endpoint instead of a service-role script so no new environment variable or dependency is needed.
+- Seeded lobbies expire relative to the click time so they remain open during a demo.
+- Kept normal lobby creation and chat behavior unchanged.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: ChatGPT (GPT-5) — authenticated demo seed endpoint for premade lobby cards` → `studygroup/app/api/demo/seed-lobbies/route.ts`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — exposes demo seeding prompt when open lobby data is sparse` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds demo lobby seeding control for sparse demo states` → `studygroup/components/LobbyList.tsx`
+
+---
+
+### Session 27 — Group repeated schedule side-list entries
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/ScheduleCalendar.tsx` | Groups repeated schedule rows into one `Your classes` side-list entry by class, location, time, and color | Partial |
+| `README.md` | Adds UI changelog note for grouped repeated class summaries | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused UI/data-presentation implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "i made a class \"CS 3704\" in the calendar and put it for repeating tuesday thursday. the \"Your Classes\" should show it repeating tuesday thursday on one entry instead of two separate entries."
+
+#### What the Code Does and Whether It Met Expectations
+
+The `Your classes` panel now groups repeated database rows into one visible entry when they share the same class name, location, start time, end time, and color. For example, a Tuesday/Thursday `CS 3704` class at the same time appears as one row labeled `TUE, THUR` instead of two duplicated rows.
+
+The timetable still renders each weekday block separately, which is the correct visual model for a weekly calendar. The grouped side-list delete button deletes every row in that grouped repeated entry.
+
+#### Modifications Made
+
+- Added a `ScheduleClassGroup` view model and `classGroups` memoized grouping step.
+- Reused the existing delete mutation through a new multi-id delete helper for grouped side-list deletes.
+- Changed the side-list count from raw blocks to grouped entries.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — groups repeated classes into one side-list entry` → `studygroup/components/ScheduleCalendar.tsx`
+
+---
+
+### Session 28 — Supabase demo seed SQL and search cleanup
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | SQL seed migration that inserts premade open lobby rows using the first existing profile as host | Yes |
+| `studygroup/app/(app)/lobbies/page.tsx` | Reads the top-header `q` search parameter and passes it into the lobby list | Partial |
+| `studygroup/components/LobbyList.tsx` | Removes the duplicate in-panel course filter and filters lobby results using the top search query plus location filter | Partial |
+| `README.md` | Updates setup/changelog notes for demo seed SQL and top-search lobby filtering | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused implementation with repository file edits, attempted hosted Supabase seed, and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "ok. can you seed the lobbies with something in the supabase? also remove the filter by course stuff since we now have a search bar on the top"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby filter panel no longer contains a separate course input. The top header search now drives lobby filtering through the `q` query parameter, matching against course ID, location, description, and host name. The location dropdown remains because it is a distinct structured filter.
+
+A Supabase SQL seed migration was added for demo preparation. It inserts six realistic open StudyGroup lobbies using the first existing `profiles` row as the host and avoids duplicating matching active seed rows. This seed is intended to be run in the Supabase SQL Editor or via a database push tool.
+
+#### Modifications Made
+
+- Attempted a direct hosted Supabase seed using the local anon key and a demo VT account, but the project blocked the new demo account with "Email not confirmed", so direct authenticated insertion from this machine could not complete.
+- Added SQL seed migration instead of requiring a service-role key in `.env.local`.
+- Updated README setup notes with the demo seed SQL file.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — wires top search query into lobby results` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes duplicate course filter in favor of top search` → `studygroup/components/LobbyList.tsx`
+- `-- AI-GENERATED: ChatGPT (GPT-5) — demo seed data for open StudyGroup lobbies` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 29 — SQL-only demo lobbies and no seed button
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Removes the user-facing `Seed demo lobbies` control and related client state | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Stops passing the sparse-data seed prompt flag to the lobby list | Partial |
+| `studygroup/app/api/demo/seed-lobbies/route.ts` | Removed the user-triggered seed endpoint | Yes |
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Replaces generic seed SQL with fake VT profiles and premade open lobby rows | Yes |
+| `README.md` | Updates changelog/setup notes to describe SQL-only demo seeding | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused implementation with repository file edits, attempted direct hosted Supabase insert, and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you not have a button that \"seeds demo lobbies\" and instead seeds it in there RIGHT NOW? like just make entries into the SQL with fake names and stuff?"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby UI no longer exposes a demo seed button or calls a seed API route. Demo lobbies are now represented as database seed SQL only, which is the right product behavior for a demo: the app loads already-populated lobby rows without revealing setup controls to users.
+
+The seed SQL now creates six fake VT student profile rows and seven premade open lobby rows with realistic course IDs, locations, descriptions, host names, majors, and years. Existing active matching lobbies are not duplicated.
+
+#### Modifications Made
+
+- Deleted the `/api/demo/seed-lobbies` route because the seed action should not be user-facing.
+- Rewrote the demo seed migration to insert fake profiles instead of using the first existing user as host.
+- Attempted to insert the fake profiles/lobbies directly into the hosted Supabase project using the configured anon key, but Supabase RLS rejected the profile insert: `new row violates row-level security policy for table "profiles"`. Applying the SQL in Supabase SQL Editor will run with database privileges and avoid that anon-key RLS limitation.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes user-facing demo seed control from lobby filters` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes user-facing demo seed prompt from lobby page` → `studygroup/app/(app)/lobbies/page.tsx`
+- `-- AI-GENERATED: ChatGPT (GPT-5) — demo seed data with fake VT profiles and open lobby rows` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 30 — Fix demo seed auth foreign keys
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Adds matching fake `auth.users` rows before inserting fake profiles and lobbies | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: SQL seed bug fix after Supabase SQL Editor error
+- Model: GPT-5
+
+#### Prompts Used
+
+1. User showed Supabase SQL error: `profiles_id_fkey` because fake profile IDs were not present in `auth.users`.
+
+#### What the Code Does and Whether It Met Expectations
+
+The demo seed SQL now inserts fake confirmed Supabase Auth users first, then upserts matching `public.profiles` rows, then inserts open demo lobbies. This addresses the foreign-key failure where `profiles.id` must exist in `auth.users`.
+
+#### Modifications Made
+
+- Added `auth.users` insert/upsert block with confirmed fake VT emails and profile metadata.
+- Kept existing fake profile/lobby data and duplicate-active-lobby protection.
+
+#### AI Comment Markers Added
+
+- `-- AI-GENERATED: ChatGPT (GPT-5) — demo seed data with fake VT auth users, profiles, and open lobby rows` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 31 — Remove lobby time limits
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/NewLobbyForm.tsx` | Removes the duration selector and creates new lobbies with a far-future internal `expires_at` value | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Stops filtering lobbies by `expires_at` so lobbies remain visible until manually closed | Partial |
+| `studygroup/components/LobbyList.tsx` | Removes the `minutes left` display from lobby cards | Partial |
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Updates demo lobby seed rows to use far-future `expires_at` values | Partial |
+| `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql` | Adds SQL migration to move existing lobby expirations to a far-future date | Yes |
+| `README.md` | Updates setup/changelog notes for no-expiry lobby behavior | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: focused implementation with repository file edits and shell verification
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can we remove all of the time limits on these study groups? lets just keep them there"
+
+#### What the Code Does and Whether It Met Expectations
+
+The app no longer treats study groups as time-limited. The lobby list does not filter by expiration, lobby cards no longer show time remaining, and the create-lobby form no longer asks for duration. Lobbies remain visible until the host manually closes them.
+
+Because the current database schema still requires `lobbies.expires_at`, new rows and seed rows use a far-future internal timestamp. A separate SQL migration updates existing lobbies to the same far-future timestamp so already-created rows also stay visible.
+
+#### Modifications Made
+
+- Removed duration state and duration select UI from `NewLobbyForm`.
+- Removed the `.gt("expires_at", now)` query filter from the lobbies page.
+- Removed the `Date.now()`-based time-left calculation from `LobbyList`.
+- Added an SQL migration to update existing lobby rows.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes lobby duration from the creation flow` → `studygroup/components/NewLobbyForm.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — keeps lobbies visible until manually closed` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — removes lobby time-left display from cards` → `studygroup/components/LobbyList.tsx`
+- `-- AI-GENERATED: ChatGPT (GPT-5) — keeps existing lobbies visible by moving expiration far into the future` → `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql`

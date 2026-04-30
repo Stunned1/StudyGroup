@@ -106,24 +106,23 @@ describe("LobbyList — knock-to-join flow", () => {
 
   it("opens the chat modal when a lobby card is clicked", async () => {
     render(<LobbyList lobbies={[baseLobby]} userId={GUEST_ID} />);
-    // Click the card's <p> element specifically (not the <option>)
-    const card = screen.getByText("Working on HW3").closest("div[class*='rounded-xl']")!;
+    const card = screen.getByTestId("lobby-card-lobby-1");
     fireEvent.click(card);
     await waitFor(() => {
-      expect(screen.getByText("🚪 Knock to join")).toBeInTheDocument();
+      expect(screen.getByText("Knock to join")).toBeInTheDocument();
     });
   });
 
   it("inserts a knock message when guest clicks 'Knock to join'", async () => {
     render(<LobbyList lobbies={[baseLobby]} userId={GUEST_ID} />);
-    const card = screen.getByText("Working on HW3").closest("div[class*='rounded-xl']")!;
+    const card = screen.getByTestId("lobby-card-lobby-1");
     fireEvent.click(card);
 
     await waitFor(() =>
-      expect(screen.getByText("🚪 Knock to join")).toBeInTheDocument()
+      expect(screen.getByText("Knock to join")).toBeInTheDocument()
     );
 
-    fireEvent.click(screen.getByText("🚪 Knock to join"));
+    fireEvent.click(screen.getByText("Knock to join"));
 
     await waitFor(() => {
       const knock = insertCalls.find(
@@ -137,7 +136,7 @@ describe("LobbyList — knock-to-join flow", () => {
 
   it("host sees Accept/Decline buttons when a knock arrives via realtime", async () => {
     render(<LobbyList lobbies={[baseLobby]} userId={HOST_ID} />);
-    const card = screen.getByText("Working on HW3").closest("div[class*='rounded-xl']")!;
+    const card = screen.getByTestId("lobby-card-lobby-1");
     fireEvent.click(card);
 
     // Wait for channel subscription to be set up
@@ -164,7 +163,7 @@ describe("LobbyList — knock-to-join flow", () => {
 
   it("host clicking Accept inserts an accepted message and adds user to lobby_members", async () => {
     render(<LobbyList lobbies={[baseLobby]} userId={HOST_ID} />);
-    const card = screen.getByText("Working on HW3").closest("div[class*='rounded-xl']")!;
+    const card = screen.getByTestId("lobby-card-lobby-1");
     fireEvent.click(card);
 
     await waitFor(() => expect(capturedInsertCallback).not.toBeNull());

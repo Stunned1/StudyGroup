@@ -1,8 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+StudyGroup is a Virginia Tech-focused study session app built with Next.js and Supabase.
 
-## Getting Started
+## Features
 
-First, run the development server:
+- Authenticated students can browse and create study lobbies.
+- Profiles support major, year, and avatar updates.
+- Signed-in users can maintain a private weekly class schedule from the Schedule sidebar tab.
+
+## Setup
+
+Required environment variables:
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL used by browser and server clients. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key used by browser and server clients. |
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -16,21 +29,55 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If styles disappear only after a development refresh, stop the dev server and run:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev:webpack
+```
 
-## Learn More
+Next.js 16 uses Turbopack for `next dev` by default. The Webpack dev script is a fallback for stale development chunks or refresh-only styling drift; production builds should still be checked with `npm run build`.
 
-To learn more about Next.js, take a look at the following resources:
+Apply Supabase migrations before using features that require new tables or columns.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The weekly Schedule tab requires `supabase/migrations/20260430120000_user_weekly_schedule.sql`. If Supabase reports that `public.schedule_classes` is missing from the schema cache, apply that migration and reload the app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Changelog
 
-## Deploy on Vercel
+**Auth**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Existing auth flow remains the entry point for all app pages.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Lobbies**
+
+- Existing lobby browsing and creation remain available from the sidebar.
+
+**Realtime**
+
+- Existing lobby message subscriptions remain unchanged.
+
+**UI**
+
+- Added a Schedule sidebar tab with a one-week class calendar and an add-class form.
+- Improved Schedule class entry with repeat presets and custom weekday toggles.
+- Right-aligned the header settings, notification, and profile actions.
+
+**Infrastructure**
+
+- Added a `schedule_classes` Supabase table for private user-owned weekly class blocks.
+- Added a Webpack dev fallback script for refresh-only styling issues caused by stale Turbopack development chunks.
+
+**Bug Fixes**
+
+- Schedule now shows a setup message instead of logging a console error when the `schedule_classes` table migration has not been applied.
+
+## Known Bugs
+
+- No known bugs are currently documented.
+
+## Minor Gaps
+
+- **Schedule editing** — Schedule entries can be added and deleted, but editing an existing class requires deleting and re-adding it.
+
+## Deferred
+
+- **Conflict detection** — Overlapping class time warnings were deferred because the first version focuses on basic account-owned schedule entry and display.

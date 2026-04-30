@@ -1,3 +1,4 @@
+// AI-ASSISTED: ChatGPT (GPT-5) — dark-mode login screen styling
 "use client";
 
 import { useState } from "react";
@@ -32,10 +33,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#861F41] px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-[#861F41] mb-1">StudyGroup</h1>
-        <p className="text-gray-500 text-sm mb-6">Sign in with your VT email</p>
+    <main className="flex min-h-screen items-center justify-center bg-[#080b12] px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111827] p-8 shadow-lg shadow-black/30">
+        <h1 className="mb-1 text-2xl font-bold text-white">StudyGroup</h1>
+        <p className="mb-6 text-sm text-gray-400">Sign in with your VT email</p>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
@@ -44,7 +45,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
+            className="rounded-lg border border-white/10 bg-[#0b1220] px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
           />
           <input
             type="password"
@@ -52,21 +53,21 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#861F41] text-black"
+            className="rounded-lg border border-white/10 bg-[#0b1220] px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
           />
-          {error && <p className="text-red-500 text-xs">{error}</p>}
+          {error && <p className="text-xs text-red-300">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#861F41] text-white rounded-lg py-2 text-sm font-semibold hover:bg-[#6d1934] disabled:opacity-50"
+            className="rounded-lg bg-[#8b7bff] py-2 text-sm font-semibold text-white hover:bg-[#7968ff] disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-gray-500 mt-4">
+        <p className="mt-4 text-center text-xs text-gray-500">
           No account?{" "}
-          <Link href="/signup" className="text-[#861F41] font-semibold hover:underline">
+          <Link href="/signup" className="font-semibold text-[#c4bcff] hover:underline">
             Sign up
           </Link>
         </p>

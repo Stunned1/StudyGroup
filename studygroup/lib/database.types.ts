@@ -1,5 +1,6 @@
 // AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema
 // AI-ASSISTED: Cursor — profiles.avatar_url column for display and storage URLs
+// AI-ASSISTED: ChatGPT (GPT-5) — schedule_classes table types for weekly class schedule
 export type Json =
   | string
   | number
@@ -117,6 +118,50 @@ export type Database = {
           year?: string | null
         }
         Relationships: []
+      }
+      schedule_classes: {
+        Row: {
+          color: string
+          course_name: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          location: string | null
+          start_time: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          course_name: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          location?: string | null
+          start_time: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          course_name?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          location?: string | null
+          start_time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_classes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

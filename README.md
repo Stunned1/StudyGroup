@@ -22,6 +22,8 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Supabase project: **StudyGroup** (`vykutvpclkadshbrgpfr`)
 - Schema is already applied via migration — tables: `profiles`, `lobbies`, `lobby_members`
 - **Profile photos:** run the SQL in `studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql` in the Supabase SQL Editor once (adds `profiles.avatar_url`, public `avatars` storage bucket, and RLS)
+- **Demo data:** run the SQL in `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` in the Supabase SQL Editor to seed premade open lobbies for demos
+- **No-expiry lobbies:** run the SQL in `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql` once to keep existing lobbies visible until manually closed
 - Auth: email/password, restricted to `@vt.edu` addresses on the client
 
 ## Changelog
@@ -43,6 +45,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Added Vitest + React Testing Library (`vitest.config.ts`, `vitest.setup.ts`, `__tests__/LobbyList.knock.test.tsx`)
 - Added `test` script to `package.json`
 - Added login page test coverage for render, VT email validation, auth failure, and success redirect (`__tests__/LoginPage.test.tsx`)
+- Added unit tests for `displayNameForUser` fallback behavior in `lib/display-name.test.ts`
 
 **Auth**
 
@@ -55,9 +58,12 @@ Find your study group — a location-based study session finder for Virginia Tec
 
 **Lobbies**
 
-- Browse page listing all open (non-expired) lobbies
-- Filter lobbies by course ID and campus location
-- Create lobby form with course, location, description, max size, and duration
+- Browse page listing lobbies until they are manually closed
+- Filter lobbies by campus location
+- Search open lobbies from the top header search bar
+- Create lobby form with course, location, description, and max size
+- Removed lobby duration/time-left behavior so study groups stay visible until closed
+- Added SQL seed migration for premade open demo lobbies with fake VT student hosts
 - Clicking a lobby card opens an in-lobby chat modal
 - In-lobby chat: guests can send messages and knock to request entry
 - Host sees Accept/Decline buttons on knock messages; accepting adds the guest to `lobby_members`
@@ -71,16 +77,38 @@ Find your study group — a location-based study session finder for Virginia Tec
 **UI**
 
 - VT maroon (#861F41) brand color applied throughout
-- Lobby cards showing course badge, location, host name, member count, and time remaining
+- Lobby cards showing course badge, location, host name, and member count
 - `AppHeader` component with VT maroon nav, "+ New Lobby" link, and avatar dropdown
 - `UserAvatar` component renders circular avatar with photo or initials fallback at any size
 - `ProfilePageClient` with avatar upload (tap to pick, save/cancel), major, and year fields
 - Circular avatars in the header and on lobby cards
+- Replaced the signed-in top header with a left sidebar that includes lobby navigation and direct "Profile settings" access
+- Added a blended app shell with persistent left sidebar plus top header containing a lobby search bar and top-right profile avatar shortcut
+- Refreshed the signed-in UI to a cleaner modern dashboard style with light sidebar, pill search bar, softer page background, and updated lobby cards/filters
+- Fully transitioned the signed-in shell and lobby browsing experience to a dark-mode-first dashboard palette (sidebar, top header, filters, cards, and chat modal)
+- Added a notifications bell button to the signed-in header for clearer dashboard-style demo affordance
+- Restyled the signed-in shell to a light, GroupHub-inspired dashboard layout with rounded search, right-side action icons, and a cleaner sidebar hierarchy
+- Restored a dark-mode-only visual system across auth, shell, lobby creation, and profile settings surfaces
+- Removed the standalone sidebar profile settings tab; profile editing now lives behind the profile/avatar entry point
+- Refined the dark header to match the modern reference spacing with a large search pill and SVG-only action icons
+- Reworked the schedule page into a traditional weekday college timetable with time rows and class blocks spanning their meeting times
+- Simplified schedule class repeats into Daily and Custom tabs with Notion-style weekday chips
+- Added visible schedule class delete controls on timetable blocks and in a side-panel class list
+- Grouped repeated schedule classes into one `Your classes` entry with combined weekday labels
+- Removed the `+ New lobby` action from the primary sidebar navigation
 
 **Bug Fixes**
 
 - Profile and lobby queries use wildcard selects so a missing `avatar_url` column before migration does not break the app
 - Header display name falls back to auth metadata or email prefix instead of "Student" (fixes wrong initials like "ST")
+- Removed global dark-mode CSS override that caused the modern dashboard refresh to flip to a black background on page reload
+- Fixed header flex behavior so the notifications button remains visible after refresh and at tighter viewport widths
+- Replaced icon-only notifications control with a high-contrast alerts pill and count badge to avoid intermittent visibility issues during refresh/demo
+- Hardened header responsiveness with grid layout and adaptive text visibility so refresh/resizing no longer squishes controls on Safari-like viewport edge cases
+- Reworked header into explicit search/notification/profile columns and reduced sidebar width at smaller desktop sizes to prevent refresh-time control squashing
+- Stabilized header column rendering by pinning `grid-template-columns` directly, preventing occasional fallback to stacked single-column rows after refresh
+- Pinned the modern dark header to explicit search/action columns so refresh no longer stretches the search bar over the action icons
+- Removed the broken custom shell CSS class approach and restored utility-based shell/header layout with inline critical SVG/search sizing
 
 ## Known Bugs
 
