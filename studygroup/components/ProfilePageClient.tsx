@@ -1,5 +1,6 @@
 // AI-GENERATED: Cursor — profile view with avatar upload (save/cancel) and major/year fields
 // AI-ASSISTED: ChatGPT (GPT-5) — dark-mode profile settings surface styling
+// AI-ASSISTED: ChatGPT (GPT-5) — displays read-only reliability rating on profiles
 "use client";
 
 import UserAvatar from "@/components/UserAvatar";
@@ -10,6 +11,10 @@ import { useCallback, useRef, useState } from "react";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+
+function reliabilityRating(value?: number | null) {
+  return Math.min(5, Math.max(1, Math.round(value ?? 4)));
+}
 
 type Props = {
   profile: Tables<"profiles">;
@@ -204,6 +209,18 @@ export default function ProfilePageClient({ profile }: Props) {
                 className="w-full rounded-lg border border-white/10 bg-[#0b1220] px-3 py-2 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
                 placeholder="e.g. Junior"
               />
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
+              Reliability
+            </dt>
+            <dd className="mt-1 text-sm font-semibold text-amber-300">
+              {"★".repeat(reliabilityRating(profile.reliability_rating))}
+              {"☆".repeat(5 - reliabilityRating(profile.reliability_rating))}
+              <span className="ml-2 text-gray-500">
+                {reliabilityRating(profile.reliability_rating)}/5
+              </span>
             </dd>
           </div>
         </dl>

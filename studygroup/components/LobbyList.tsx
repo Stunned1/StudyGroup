@@ -10,6 +10,7 @@
 // AI-ASSISTED: ChatGPT (GPT-5) — wires reliable demo chat replies with Gemini fallback
 // AI-ASSISTED: ChatGPT (GPT-5) — polishes recorded demo room behavior and removes stale request UI
 // AI-ASSISTED: ChatGPT (GPT-5) — prevents realtime echoes from duplicating optimistic demo chat messages
+// AI-ASSISTED: ChatGPT (GPT-5) — displays 1-5 star reliability ratings for demo profiles
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -26,7 +27,7 @@ type LobbyRow = {
   max_size: number;
   expires_at: string;
   host_id: string;
-  profiles: { name: string } | null;
+  profiles: { name: string; reliability_rating?: number | null } | null;
   lobby_members: { count: number | string }[];
 };
 
@@ -38,6 +39,7 @@ type LobbyMemberProfile = {
     year?: string | null;
     avatar_url?: string | null;
     email?: string | null;
+    reliability_rating?: number | null;
   } | null;
 };
 
@@ -229,6 +231,25 @@ function scheduleForDemoUser(userId: string, displayName: string) {
   if (DEMO_SCHEDULES[userId]) return DEMO_SCHEDULES[userId];
   if (displayName === "Aidan Nguyen") return DEMO_SCHEDULES[DEMO_IDS.aidan];
   return [];
+}
+
+function reliabilityRating(value?: number | null) {
+  return Math.min(5, Math.max(1, Math.round(value ?? 4)));
+}
+
+function ReliabilityStars({ value }: { value?: number | null }) {
+  const rating = reliabilityRating(value);
+
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-300"
+      aria-label={`${rating} out of 5 reliability`}
+      title={`${rating} out of 5 reliability`}
+    >
+      <span aria-hidden="true">{"★".repeat(rating)}{"☆".repeat(5 - rating)}</span>
+      <span className="text-gray-500">{rating}/5</span>
+    </span>
+  );
 }
 
 function lobbyMessagesTable(supabase: ReturnType<typeof createClient>) {
@@ -883,6 +904,7 @@ export default function LobbyList({
                     )}
                     <p className="mt-3 text-xs text-gray-500">
                       Host: {lobby.profiles?.name ?? "Unknown"} ·{" "}
+                      <ReliabilityStars value={lobby.profiles?.reliability_rating} /> ·{" "}
                       {memberCount}/{lobby.max_size} members
                     </p>
                   </div>
@@ -1130,6 +1152,11 @@ export default function LobbyList({
                               <span className="block truncate text-xs text-gray-500">
                                 {member.profiles?.major ?? "Virginia Tech"} ·{" "}
                                 {member.profiles?.year ?? "Student"}
+                              </span>
+                              <span className="mt-1 block">
+                                <ReliabilityStars
+                                  value={member.profiles?.reliability_rating}
+                                />
                               </span>
                             </span>
                             <span

@@ -1,6 +1,7 @@
 -- AI-GENERATED: ChatGPT (GPT-5) — full recorded-demo seed data for users, lobbies, memberships, and schedules
 -- AI-ASSISTED: ChatGPT (GPT-5) — resets demo viewer membership so the CS 3704 join step remains recordable
 -- AI-ASSISTED: ChatGPT (GPT-5) — fills every seeded lobby with fake peer members and clears Aidan memberships
+-- AI-ASSISTED: ChatGPT (GPT-5) — seeds 1-5 reliability ratings for demo profiles
 -- Phase 1 demo world seed.
 -- Apply after the base schema and `20260430120000_user_weekly_schedule.sql`.
 
@@ -72,18 +73,24 @@ set
   raw_user_meta_data = excluded.raw_user_meta_data,
   updated_at = now();
 
-with demo_users(email, name, major, year) as (
+with demo_users(email, name, major, year, reliability_rating) as (
   values
-    ('anguy98@vt.edu', 'Aidan Nguyen', 'Computer Science', 'Junior'),
-    ('priya.shah@vt.edu', 'Priya Shah', 'Computer Science', 'Junior'),
-    ('marcus.johnson@vt.edu', 'Marcus Johnson', 'Business Information Technology', 'Senior'),
-    ('emily.chen@vt.edu', 'Emily Chen', 'Biochemistry', 'Sophomore'),
-    ('noah.martinez@vt.edu', 'Noah Martinez', 'Mechanical Engineering', 'Junior'),
-    ('ava.williams@vt.edu', 'Ava Williams', 'English', 'Freshman'),
-    ('ethan.nguyen@vt.edu', 'Ethan Nguyen', 'Physics', 'Senior')
+    ('anguy98@vt.edu', 'Aidan Nguyen', 'Computer Science', 'Junior', 5),
+    ('priya.shah@vt.edu', 'Priya Shah', 'Computer Science', 'Junior', 5),
+    ('marcus.johnson@vt.edu', 'Marcus Johnson', 'Business Information Technology', 'Senior', 4),
+    ('emily.chen@vt.edu', 'Emily Chen', 'Biochemistry', 'Sophomore', 5),
+    ('noah.martinez@vt.edu', 'Noah Martinez', 'Mechanical Engineering', 'Junior', 4),
+    ('ava.williams@vt.edu', 'Ava Williams', 'English', 'Freshman', 3),
+    ('ethan.nguyen@vt.edu', 'Ethan Nguyen', 'Physics', 'Senior', 4)
 )
-insert into public.profiles (id, email, name, major, year)
-select auth_users.id, demo_users.email, demo_users.name, demo_users.major, demo_users.year
+insert into public.profiles (id, email, name, major, year, reliability_rating)
+select
+  auth_users.id,
+  demo_users.email,
+  demo_users.name,
+  demo_users.major,
+  demo_users.year,
+  demo_users.reliability_rating
 from demo_users
 join auth.users auth_users on auth_users.email = demo_users.email
 on conflict (id) do update
@@ -91,7 +98,8 @@ set
   email = excluded.email,
   name = excluded.name,
   major = excluded.major,
-  year = excluded.year;
+  year = excluded.year,
+  reliability_rating = excluded.reliability_rating;
 
 insert into public.lobbies (
   id,

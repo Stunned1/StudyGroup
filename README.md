@@ -24,6 +24,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Schema is already applied via migration — tables: `profiles`, `lobbies`, `lobby_members`
 - **Profile photos:** run the SQL in `studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql` in the Supabase SQL Editor once (adds `profiles.avatar_url`, public `avatars` storage bucket, and RLS)
 - **Weekly schedule table:** run the SQL in `studygroup/supabase/migrations/20260430120000_user_weekly_schedule.sql` in the Supabase SQL Editor once before using schedule/demo-calendar features
+- **Profile reliability ratings:** run the SQL in `studygroup/supabase/migrations/20260430149000_profile_reliability_rating.sql` once before refreshing demo data
 - **Demo data:** after the weekly schedule table exists, run the SQL in `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` in the Supabase SQL Editor to seed or refresh demo users, lobbies, memberships, and calendars
 - **No-expiry lobbies:** run the SQL in `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql` once to keep existing lobbies visible until manually closed
 - Auth: email/password, restricted to `@vt.edu` addresses on the client
@@ -37,6 +38,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Created typed Supabase server and browser clients
 - Added `/api/demo/chat` with optional Gemini replies and a deterministic scripted fallback for recorded demos
 - Added a short Gemini timeout so demo chat falls back quickly instead of blocking a recording
+- Added a profile reliability rating migration with a 1-5 range check
 - Applied initial database migration (profiles, lobbies, lobby_members with RLS)
 - Enabled Supabase Realtime on lobbies and lobby_members tables
 - Generated TypeScript types from live Supabase schema
@@ -77,6 +79,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - In-lobby chat sends demo messages through Gemini when configured and falls back to scripted VT student replies when unavailable
 - Rerunning the demo seed removes Aidan from the CS 3704 membership so the direct Join group step can be recorded again
 - Demo setup now removes Aidan from all preexisting lobby memberships and fills every seeded lobby with fake peer members
+- Demo profiles now include seeded 1-5 reliability ratings
 - Host can close (delete) their own lobby from the chat modal
 
 **Realtime**
@@ -111,6 +114,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Removed the `+ New lobby` action from the primary sidebar navigation
 - Added a left-sidebar `Groups` tab for the signed-in user's current study groups
 - Added a prominent left-sidebar `Create group` action and aligned the creation page with group wording
+- Displayed reliability ratings as 1-5 stars on lobby hosts, group members, and profile pages
 
 **Bug Fixes**
 

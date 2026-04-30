@@ -1735,6 +1735,93 @@ The hosted Supabase project was updated with the same membership reset behavior 
 
 ---
 
+### Session 45 — Profile reliability ratings
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430149000_profile_reliability_rating.sql` | Adds a required 1-5 `profiles.reliability_rating` column with a range check | Yes |
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Seeds deterministic reliability ratings for every demo profile | Partial |
+| `studygroup/components/LobbyList.tsx` | Displays reliability as 1-5 stars on lobby hosts and group members | Partial |
+| `studygroup/components/ProfilePageClient.tsx` | Displays the signed-in profile's reliability rating as read-only stars | Partial |
+| `studygroup/lib/database.types.ts` | Adds `reliability_rating` to the local Supabase profile types | Partial |
+| Hosted Supabase project `vykutvpclkadshbrgpfr` | Applies the reliability column and updates demo profile ratings | No |
+| `README.md` | Documents the reliability migration and visible star ratings | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: focused implementation plus Supabase MCP migration/data update
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you make it so everyone has a reliability rating? and just preseed those reliability ratings. it should just be 1-5 stars..."
+
+#### What the Code Does and Whether It Met Expectations
+
+Profiles now have a `reliability_rating` column constrained to values from 1 through 5. The demo seed assigns deterministic ratings to Aidan and all fake demo peers. The hosted Supabase project was updated with the same schema and seed values.
+
+The app displays ratings as star strings with a numeric `x/5` label on lobby host metadata, member rows inside the room modal, and the signed-in profile page. This keeps the feature visible during the recorded demo without adding a rating workflow.
+
+#### Modifications Made
+
+- Added a migration before the demo seed so the seed can safely write ratings.
+- Updated the demo seed profile upsert to include `reliability_rating`.
+- Updated local Supabase TypeScript profile types.
+- Added a small star-rendering helper in the lobby list and a read-only profile display.
+- Applied and verified hosted demo profile ratings through Supabase MCP.
+- Updated README setup and changelog entries.
+
+#### AI Comment Markers Added
+
+- `-- AI-GENERATED: ChatGPT (GPT-5) — adds 1-5 profile reliability ratings for demo trust signals` → `studygroup/supabase/migrations/20260430149000_profile_reliability_rating.sql`
+- `-- AI-ASSISTED: ChatGPT (GPT-5) — seeds 1-5 reliability ratings for demo profiles` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — displays 1-5 star reliability ratings for demo profiles` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — displays read-only reliability rating on profiles` → `studygroup/components/ProfilePageClient.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — profile reliability rating column for demo trust signals` → `studygroup/lib/database.types.ts`
+
+---
+
+### Session 46 — Hosted demo reset with reliability ratings
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| Hosted Supabase project `vykutvpclkadshbrgpfr` | Restages the hosted demo with no Aidan memberships or hosted lobbies, seeded peer rosters, and profile reliability ratings | No |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: Supabase MCP SQL execution
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "nice, now can you set the stage for the demo"
+
+#### What the Code Does and Whether It Met Expectations
+
+The hosted Supabase project was reset for the recorded demo after reliability ratings were added. The reset removed all `lobby_members` rows for `anguy98@vt.edu`, deleted any lobbies hosted by Aidan from practice runs, restored fake peer rosters for all seeded lobbies, and reapplied the seeded profile reliability ratings.
+
+Verification showed Aidan has zero joined groups and zero hosted lobbies. CS 3704 has Priya Shah at 5/5 and Marcus Johnson at 4/5, and every seeded lobby has fake peers with 1-5 reliability ratings.
+
+#### Modifications Made
+
+- Removed Aidan from all hosted lobby memberships.
+- Deleted Aidan-hosted practice lobbies.
+- Reinserted seeded fake peer memberships.
+- Reapplied seeded reliability ratings.
+- Verified lobby rosters, ratings, and far-future expiration values.
+
+#### AI Comment Markers Added
+
+- No code files were changed for this hosted database operation.
+
+---
+
 ### Session 41 — Joined groups sidebar tab
 
 #### What Was Built
@@ -1851,3 +1938,40 @@ The signed-in sidebar now has a clear `Create group` action, so users can start 
 - `// AI-ASSISTED: ChatGPT (GPT-5) — adds create-group entry points to the Groups page` → `studygroup/app/(app)/groups/page.tsx`
 - `// AI-ASSISTED: ChatGPT (GPT-5) — returns users to their Groups page after creating a group` → `studygroup/components/NewLobbyForm.tsx`
 - `// AI-ASSISTED: ChatGPT (GPT-5) — aligns creation page wording with study groups` → `studygroup/app/(app)/lobbies/new/page.tsx`
+
+---
+
+### Session 44 — Hosted demo stage reset
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| Hosted Supabase project `vykutvpclkadshbrgpfr` | Resets hosted demo data so Aidan starts with no joined or hosted groups while seeded lobbies retain fake peer rosters | No |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: Supabase MCP SQL execution
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "ok nice, set the demo stage for me now please"
+
+#### What the Code Does and Whether It Met Expectations
+
+The hosted Supabase database was staged for the recorded demo. The reset removed all `lobby_members` rows for `anguy98@vt.edu`, deleted any lobbies hosted by that user from previous practice runs, and restored the intended fake peer memberships for all deterministic seeded lobbies.
+
+Verification showed Aidan has zero joined groups and zero hosted lobbies. The seven seeded lobbies remain available with fake peer rosters, including CS 3704 with Priya Shah and Marcus Johnson. The hosted project does not currently have a `public.lobby_messages` table, so there were no hosted chat rows to clear.
+
+#### Modifications Made
+
+- Removed Aidan from all hosted lobby memberships.
+- Deleted any Aidan-hosted practice lobbies.
+- Reinserted fake peer rosters for the seeded demo lobbies.
+- Verified seeded lobby member counts and far-future expiration values.
+
+#### AI Comment Markers Added
+
+- No code files were changed for this hosted database operation.

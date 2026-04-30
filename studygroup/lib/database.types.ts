@@ -1,6 +1,7 @@
 // AI-GENERATED: Kiro — TypeScript types generated from live Supabase schema
 // AI-ASSISTED: Cursor — profiles.avatar_url column for display and storage URLs
 // AI-ASSISTED: ChatGPT (GPT-5) — schedule_classes table types for weekly class schedule
+// AI-ASSISTED: ChatGPT (GPT-5) — profile reliability rating column for demo trust signals
 export type Json =
   | string
   | number
@@ -97,6 +98,7 @@ export type Database = {
           id: string
           major: string | null
           name: string
+          reliability_rating: number
           year: string | null
         }
         Insert: {
@@ -106,6 +108,7 @@ export type Database = {
           id: string
           major?: string | null
           name: string
+          reliability_rating?: number
           year?: string | null
         }
         Update: {
@@ -115,6 +118,7 @@ export type Database = {
           id?: string
           major?: string | null
           name?: string
+          reliability_rating?: number
           year?: string | null
         }
         Relationships: []
