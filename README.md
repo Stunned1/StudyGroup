@@ -16,13 +16,15 @@ Find your study group — a location-based study session finder for Virginia Tec
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `GEMINI_API_KEY` | Optional Gemini key for demo chat replies; scripted fallback is used when unset or when Gemini fails |
 
 ### First-time setup
 
 - Supabase project: **StudyGroup** (`vykutvpclkadshbrgpfr`)
 - Schema is already applied via migration — tables: `profiles`, `lobbies`, `lobby_members`
 - **Profile photos:** run the SQL in `studygroup/supabase/migrations/20250410120000_profile_avatar_storage.sql` in the Supabase SQL Editor once (adds `profiles.avatar_url`, public `avatars` storage bucket, and RLS)
-- **Demo data:** run the SQL in `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` in the Supabase SQL Editor to seed premade open lobbies for demos
+- **Weekly schedule table:** run the SQL in `studygroup/supabase/migrations/20260430120000_user_weekly_schedule.sql` in the Supabase SQL Editor once before using schedule/demo-calendar features
+- **Demo data:** after the weekly schedule table exists, run the SQL in `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` in the Supabase SQL Editor to seed or refresh demo users, lobbies, memberships, and calendars
 - **No-expiry lobbies:** run the SQL in `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql` once to keep existing lobbies visible until manually closed
 - Auth: email/password, restricted to `@vt.edu` addresses on the client
 
@@ -33,6 +35,8 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Scaffolded Next.js 15 app with TypeScript, Tailwind, and App Router
 - Installed and configured `@supabase/supabase-js` and `@supabase/ssr`
 - Created typed Supabase server and browser clients
+- Added `/api/demo/chat` with optional Gemini replies and a deterministic scripted fallback for recorded demos
+- Added a short Gemini timeout so demo chat falls back quickly instead of blocking a recording
 - Applied initial database migration (profiles, lobbies, lobby_members with RLS)
 - Enabled Supabase Realtime on lobbies and lobby_members tables
 - Generated TypeScript types from live Supabase schema
@@ -42,7 +46,7 @@ Find your study group — a location-based study session finder for Virginia Tec
 - SQL migration for `profiles.avatar_url`, public `avatars` Storage bucket, storage RLS, and profile self-update policy
 - Renamed `middleware.ts` to `proxy.ts` and updated export to `proxy` per Next.js 15 convention
 - Added `turbopack.root` to `next.config.ts` to fix workspace root detection in monorepo-style folder
-- Added Vitest + React Testing Library (`vitest.config.ts`, `vitest.setup.ts`, `__tests__/LobbyList.knock.test.tsx`)
+- Added Vitest + React Testing Library (`vitest.config.ts`, `vitest.setup.ts`, `__tests__/LobbyList.join.test.tsx`)
 - Added `test` script to `package.json`
 - Added login page test coverage for render, VT email validation, auth failure, and success redirect (`__tests__/LoginPage.test.tsx`)
 - Added unit tests for `displayNameForUser` fallback behavior in `lib/display-name.test.ts`
@@ -59,14 +63,20 @@ Find your study group — a location-based study session finder for Virginia Tec
 **Lobbies**
 
 - Browse page listing lobbies until they are manually closed
+- Groups page for study groups the signed-in user has joined or created
 - Filter lobbies by campus location
 - Search open lobbies from the top header search bar
 - Create lobby form with course, location, description, and max size
+- Visible `Create group` action on the lobbies page opens the existing group creation form
+- Visible `Create group` actions in the sidebar and Groups page let students make their own study group quickly
 - Removed lobby duration/time-left behavior so study groups stay visible until closed
-- Added SQL seed migration for premade open demo lobbies with fake VT student hosts
+- Added SQL seed migration for the recorded demo world with fake VT student hosts, full lobby memberships, and weekly calendars
 - Clicking a lobby card opens an in-lobby chat modal
-- In-lobby chat: guests can send messages and knock to request entry
-- Host sees Accept/Decline buttons on knock messages; accepting adds the guest to `lobby_members`
+- In-lobby join flow: guests can click "Join group" and immediately see joined state, members, and chat access
+- Lobby room modal now shows right-side member selection, multi-person calendar comparison, suggested shared times, and a schedule-session confirmation
+- In-lobby chat sends demo messages through Gemini when configured and falls back to scripted VT student replies when unavailable
+- Rerunning the demo seed removes Aidan from the CS 3704 membership so the direct Join group step can be recorded again
+- Demo setup now removes Aidan from all preexisting lobby memberships and fills every seeded lobby with fake peer members
 - Host can close (delete) their own lobby from the chat modal
 
 **Realtime**
@@ -91,11 +101,16 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Restored a dark-mode-only visual system across auth, shell, lobby creation, and profile settings surfaces
 - Removed the standalone sidebar profile settings tab; profile editing now lives behind the profile/avatar entry point
 - Refined the dark header to match the modern reference spacing with a large search pill and SVG-only action icons
+- Tuned the top search placeholder to make the recorded `CS 3704` lookup obvious
+- Added a traditional college timetable comparison inside the lobby room with multiple selected members overlaid
+- Locked the lobby room modal into a side-by-side layout so the member list stays in the right rail beside the calendar during the recorded demo
 - Reworked the schedule page into a traditional weekday college timetable with time rows and class blocks spanning their meeting times
 - Simplified schedule class repeats into Daily and Custom tabs with Notion-style weekday chips
 - Added visible schedule class delete controls on timetable blocks and in a side-panel class list
 - Grouped repeated schedule classes into one `Your classes` entry with combined weekday labels
 - Removed the `+ New lobby` action from the primary sidebar navigation
+- Added a left-sidebar `Groups` tab for the signed-in user's current study groups
+- Added a prominent left-sidebar `Create group` action and aligned the creation page with group wording
 
 **Bug Fixes**
 
@@ -109,6 +124,9 @@ Find your study group — a location-based study session finder for Virginia Tec
 - Stabilized header column rendering by pinning `grid-template-columns` directly, preventing occasional fallback to stacked single-column rows after refresh
 - Pinned the modern dark header to explicit search/action columns so refresh no longer stretches the search bar over the action icons
 - Removed the broken custom shell CSS class approach and restored utility-based shell/header layout with inline critical SVG/search sizing
+- Fixed the recorded demo seed so it updates existing demo auth users by email instead of failing on duplicate email rows
+- Removed stale request-to-join room controls so the recorded demo only shows the direct Join group flow
+- Prevented realtime echoes from duplicating optimistic local chat messages in the lobby room
 
 ## Known Bugs
 

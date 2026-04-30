@@ -8,6 +8,7 @@
 // AI-ASSISTED: ChatGPT (GPT-5) — modern dark header spacing with SVG search and action icons
 // AI-ASSISTED: ChatGPT (GPT-5) — pins header search/action columns to prevent refresh-time stretching
 // AI-ASSISTED: ChatGPT (GPT-5) — right-aligns header action icons in the available header space
+// AI-ASSISTED: ChatGPT (GPT-5) — tunes global search placeholder for recorded CS 3704 demo flow
 import AppHeader from "@/components/AppHeader";
 import UserAvatar from "@/components/UserAvatar";
 import { displayNameForUser } from "@/lib/display-name";
@@ -122,7 +123,7 @@ export default async function AppShellLayout({
                   id="global-search"
                   name="q"
                   type="search"
-                  placeholder="Search groups, hobbies, or cities..."
+                  placeholder="Search CS 3704, courses, groups, or locations..."
                   className="h-14 w-full rounded-full border border-white/10 bg-[#171b2d] pr-5 text-lg text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8b7bff]/40"
                   style={{
                     WebkitAppearance: "none",

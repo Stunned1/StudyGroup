@@ -1363,3 +1363,491 @@ Because the current database schema still requires `lobbies.expires_at`, new row
 - `// AI-ASSISTED: ChatGPT (GPT-5) — keeps lobbies visible until manually closed` → `studygroup/app/(app)/lobbies/page.tsx`
 - `// AI-ASSISTED: ChatGPT (GPT-5) — removes lobby time-left display from cards` → `studygroup/components/LobbyList.tsx`
 - `-- AI-GENERATED: ChatGPT (GPT-5) — keeps existing lobbies visible by moving expiration far into the future` → `studygroup/supabase/migrations/20260430151000_remove_lobby_expiration_behavior.sql`
+
+---
+
+### Session 32 — Phase 1 recorded demo seed world
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Rebuilds the demo seed into a deterministic recorded-demo world with fake auth users, profiles, lobbies, lobby members, and schedules | Partial |
+| `README.md` | Documents the seed order and describes the demo seed as users, lobbies, memberships, and calendars | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex desktop**
+- Mode: developer-phase-implementer, Phase 1 only
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "ok, lets do this! lets start with phase 1. dont come back to me unless you REALLY have to, or until phase 1 is done"
+
+#### What the Code Does and Whether It Met Expectations
+
+The demo seed now provides a stable world for the recorded story. It creates a demo student account (`Aidan Nguyen` at `anguy98@vt.edu`), fake peer accounts (`Priya Shah`, `Marcus Johnson`, `Emily Chen`, `Noah Martinez`, `Ava Williams`, and `Ethan Nguyen`), a primary `CS 3704` lobby, supporting lobbies for other courses, and seeded `lobby_members` rows so the `CS 3704` room already has other students attached.
+
+It also seeds weekly schedules for the demo student and peers, with matching `CS 3704` Tuesday/Thursday blocks and additional class blocks to support later calendar-comparison work. Lobbies use far-future internal expiration values so they stay visible until manually closed.
+
+#### Modifications Made
+
+- Replaced random/default lobby IDs with deterministic UUIDs so later demo phases can reference the `CS 3704` lobby reliably.
+- Added deterministic `lobby_members` rows for the primary demo lobby.
+- Added schedule seed rows for the demo student and peer students.
+- Updated the recorded demo user's email to `anguy98@vt.edu`.
+- Updated README setup notes to require the weekly schedule migration before running the demo seed.
+
+#### AI Comment Markers Added
+
+- `-- AI-GENERATED: ChatGPT (GPT-5) — full recorded-demo seed data for users, lobbies, memberships, and schedules` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+### Session 33 — Apply and harden hosted demo seed
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Makes the demo seed reusable when a demo auth account already exists by updating auth users by email before inserting missing accounts | Partial |
+| `README.md` | Notes that demo data can be seeded or refreshed and records the duplicate-email seed fix | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: Supabase MCP execution plus focused SQL/doc update
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "Start now with applying and verifying Phase 1 Supabase seed SQL using Supabase MCP."
+
+#### What the Code Does and Whether It Met Expectations
+
+The hosted Supabase StudyGroup project was updated with the weekly schedule table, recorded-demo seed data, and no-expiry lobby update. The original seed failed because `anguy98@vt.edu` already existed in `auth.users`, and the seed only handled conflicts by user ID. The seed migration now first updates existing demo auth users by email, inserts only missing demo auth users, then upserts matching profiles and reseeds lobbies, lobby members, and schedules.
+
+The hosted database verification met expectations: `auth.users` contains `anguy98@vt.edu`, `public.profiles` contains Aidan Nguyen, the deterministic `CS 3704` lobby exists, Priya Shah and Marcus Johnson are members, seeded schedules exist for Aidan/Priya/Marcus, and all seven demo lobbies have `expires_at` set to `2099-12-31 23:59:59+00`.
+
+#### Modifications Made
+
+- Replaced the seed's bulk `auth.users` insert with an update-then-insert flow keyed by email.
+- Changed profile and Aidan schedule seeding to use the actual auth user ID for each email, so an existing `anguy98@vt.edu` account remains usable.
+- Updated README wording to describe the demo seed as a refreshable setup step.
+
+#### AI Comment Markers Added
+
+- `-- AI-GENERATED: ChatGPT (GPT-5) — full recorded-demo seed data for users, lobbies, memberships, and schedules` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 34 — Phase 2 search and join flow
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Replaces the guest knock affordance with an optimistic "Join group" flow that reveals joined state, member chips, and chat access | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Loads the current user's lobby memberships and passes joined lobby IDs into the lobby list | Partial |
+| `studygroup/app/(app)/layout.tsx` | Updates the global search placeholder so the `CS 3704` recorded demo search is obvious | Partial |
+| `studygroup/__tests__/LobbyList.join.test.tsx` | Tests search filtering, non-host join button visibility, optimistic join insertion, and pre-joined state | Partial |
+| `README.md` | Documents the join-flow behavior and search placeholder polish | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer, Phase 2 only
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "ok $developer-phase-implementer keep goin please."
+2. Skill instructions for `developer-phase-implementer` required implementing only the current phase and stopping after handoff.
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby page now passes the signed-in user's existing lobby memberships to `LobbyList`, so the modal can start in a joined state when appropriate. Non-host users who are not already members see a clear "Join group" button in the lobby modal. Clicking it immediately marks the user as joined, increments the visible member count locally, adds a "You" member chip, and enables the chat input. The handler also attempts to insert the membership into `public.lobby_members` and posts a lightweight system-style joined message when the insert succeeds.
+
+The top search remains server-driven through `/lobbies?q=...`, and the header placeholder now explicitly suggests `CS 3704` for the recorded demo. Focused tests verify that searching for `CS 3704` filters the list, opening the lobby shows the join button, clicking join inserts a membership and enables chat, and pre-existing membership state hides the join button.
+
+#### Modifications Made
+
+- Converted the non-host modal action from "Knock to join" to "Join group".
+- Added local optimistic joined state and count overrides so the demo does not depend on realtime or a refresh.
+- Added member-chip loading from `lobby_members` for the opened lobby.
+- Reworked the old knock-flow test file into join-flow coverage and renamed it to match the behavior.
+- Updated README notes for the new user-facing join flow.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds deterministic optimistic join flow for recorded demos` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — passes current memberships for deterministic join state` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — tunes global search placeholder for recorded CS 3704 demo flow` → `studygroup/app/(app)/layout.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — verifies optimistic join behavior for recorded demo lobby flow` → `studygroup/__tests__/LobbyList.join.test.tsx`
+
+---
+
+### Session 35 — Phases 3-6 room, calendar comparison, availability, and scheduling
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Expands the lobby modal into a demo study room with member cards, clickable profiles, calendar comparison, shared availability suggestions, and scheduled-session confirmation | Partial |
+| `studygroup/__tests__/LobbyList.join.test.tsx` | Extends join-flow tests to cover member/profile visibility, shared availability, and scheduling confirmation | Partial |
+| `README.md` | Documents the modal room, calendar comparison, shared availability, and schedule-session behavior | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer, Phases 3-6 in one requested block
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "nice! lets continue with what you have to do. don't come back to me until phase 6 is done! $developer-phase-implementer"
+2. Skill instructions for `developer-phase-implementer` were supplied again; the user explicitly overrode the usual one-phase stop by asking to continue through Phase 6 before reporting back.
+
+#### What the Code Does and Whether It Met Expectations
+
+The CS 3704 lobby modal now behaves more like a study group room. After joining, the left side shows member cards with avatars/initials and profile metadata, the center shows the selected peer profile plus a side-by-side weekly calendar comparison, and the right side keeps the group chat. Member cards are clickable and update the selected profile/calendar area.
+
+Calendar comparison loads the current user's `schedule_classes` where available and attempts to load the selected peer schedule. Because the current schedule table RLS is owner-only, the component includes deterministic seeded schedule fallbacks for Aidan Nguyen, Priya Shah, and Marcus Johnson so the recorded demo remains reliable even when peer schedule reads are blocked by RLS.
+
+Shared availability is intentionally deterministic for the recorded story. The room suggests Tuesday 6:30 PM and Thursday 6:30 PM at Newman Library, labels the best option, and provides a `Schedule study session` action. Scheduling shows an in-room confirmation with course, time, location, and participants, and appends a system-style chat message.
+
+#### Modifications Made
+
+- Reworked the single-column chat modal into a three-panel room layout.
+- Added member profile state, selected peer state, current/peer schedule state, deterministic schedule fallbacks, and suggested availability options.
+- Added a compact `MiniSchedule` calendar preview component inside `LobbyList.tsx` to keep the implementation local to the demo room.
+- Added local scheduled-session confirmation and chat message insertion without introducing new schema.
+- Extended the existing join-flow tests to validate the Phases 3-6 demo path.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds demo room members, calendar comparison, shared availability, and session scheduling` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — verifies optimistic join behavior for recorded demo lobby flow` → `studygroup/__tests__/LobbyList.join.test.tsx`
+
+---
+
+### Session 36 — Multi-person calendar room polish and Phase 8 create group action
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Moves members into the right rail, supports selecting multiple peers, and replaces compact calendars with a traditional timetable comparison | Partial |
+| `studygroup/app/(app)/lobbies/page.tsx` | Adds a visible `Create group` action on the lobbies page that links to the existing group creation form | Partial |
+| `studygroup/components/NewLobbyForm.tsx` | Aligns submit copy with the `Create group` demo wording | Partial |
+| `studygroup/__tests__/LobbyList.join.test.tsx` | Keeps join/scheduling coverage aligned with multi-person scheduling confirmation | Partial |
+| `README.md` | Documents the right-side member selection, multi-person timetable comparison, and visible create-group action | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer, requested room refinements plus Phase 8
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you make it so you are able to see the members list on the right side instead of seeing them on the top. also make the calendar look like the traditional classic college calendar (similar to how our own schedule is), also we should be able to select multiple people to see all of our calendars! after that, continue to phase 8 $developer-phase-implementer"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby room now puts member selection in the right rail near chat instead of the main/top calendar area. Members can be toggled on and off, and the comparison calendar always includes the current user plus all selected peers. The calendar was replaced with a traditional weekday timetable grid similar to the dedicated schedule page, with time rows, weekday columns, and colored class blocks overlaid for each selected person.
+
+Phase 8 is implemented with a visible `Create group` action on the lobbies page. It links to the existing `/lobbies/new` form, and the form continues to create no-expiry groups and redirect back to `/lobbies` after creation.
+
+#### Modifications Made
+
+- Replaced single selected-peer state with multi-selected member IDs.
+- Added per-peer schedule cache state so selected users can be shown together.
+- Replaced compact schedule cards with a timetable-style `ComparisonCalendar` inside `LobbyList.tsx`.
+- Moved members/status into the right rail and kept chat below them.
+- Added the lobbies-page `Create group` link and aligned form button wording.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — moves members to right rail and renders multi-person traditional calendar comparison` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds visible create-group action on lobbies page` → `studygroup/app/(app)/lobbies/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — aligns create copy with group demo flow` → `studygroup/components/NewLobbyForm.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — verifies optimistic join behavior for recorded demo lobby flow` → `studygroup/__tests__/LobbyList.join.test.tsx`
+
+---
+
+### Session 37 — Phase 7 demo chat and modal layout lock
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/api/demo/chat/route.ts` | Provides a recorded-demo chat endpoint that uses Gemini when configured and a scripted fallback otherwise | Yes |
+| `studygroup/components/LobbyList.tsx` | Keeps the room modal in a side-by-side calendar/member layout and sends chat messages through the demo chat endpoint | Partial |
+| `studygroup/__tests__/LobbyList.join.test.tsx` | Verifies the joined room can send a demo chat message and render the fallback response | Partial |
+| `README.md` | Documents the optional Gemini key, demo chat route, and fixed right-rail room layout | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer with user override to continue through Phase 8
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "everything is stacked on top of eachother, i want to see the members tab on the right as a sidebar of the popup! then their calendar should pop up beside them! also do phases 1-8 (just do everything up to phase 8!) $developer-phase-implementer"
+
+#### What the Code Does and Whether It Met Expectations
+
+The lobby room modal now uses a fixed two-column body so the calendar comparison stays on the left and the status/member/chat rail stays on the right. The traditional timetable remains horizontally scrollable inside the left column instead of forcing the right-side member list to stack above or below it.
+
+Phase 7 is implemented with `/api/demo/chat`. The endpoint calls Gemini only when `GEMINI_API_KEY` is present, keeps the prompt short and demo-specific, and returns a scripted VT student fallback whenever the key is missing or the provider call fails. The room chat appends the user's message immediately, shows a typing state, and appends the returned demo reply so the recorded flow remains reliable.
+
+#### Modifications Made
+
+- Removed the breakpoint-driven one-column modal body that caused the member list to stack.
+- Added local seeded CS 3704 opening chat messages when no database messages exist.
+- Added optimistic local chat messages, a typing state, and a call to `/api/demo/chat`.
+- Added a focused fallback-chat test.
+- Documented the optional `GEMINI_API_KEY` environment variable.
+
+#### AI Comment Markers Added
+
+- `// AI-GENERATED: ChatGPT (GPT-5) — demo chat endpoint with Gemini and scripted fallback` → `studygroup/app/api/demo/chat/route.ts`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — wires reliable demo chat replies with Gemini fallback` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — verifies optimistic join behavior for recorded demo lobby flow` → `studygroup/__tests__/LobbyList.join.test.tsx`
+
+---
+
+### Session 38 — Phase 9 recorded demo polish
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/LobbyList.tsx` | Removes stale request-to-join handling from the room UI, makes demo chat replies independent of message persistence latency, and improves empty-state copy | Partial |
+| `studygroup/__tests__/LobbyList.join.test.tsx` | Updates test comments to match the direct Join group demo flow | Partial |
+| `README.md` | Records final demo polish and keeps the test filename documentation current | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer, Phase 9 polish
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "nice, now finish all the phases!! $developer-phase-implementer"
+
+#### What the Code Does and Whether It Met Expectations
+
+The final polish removes the legacy request-to-join branch from the lobby room so the recorded demo presents one clear membership path: `Join group`. Sending a chat message now appends locally and starts the Gemini/fallback response without waiting on the Supabase insert, which keeps the recording flow responsive even if persistence is slow. The empty lobby/search state now uses calmer product copy instead of an awkward "Create one!" prompt.
+
+The README now points to the current `LobbyList.join.test.tsx` file and records the final room-control cleanup. The focused and full test suites plus the production build are expected to verify the final demo state.
+
+#### Modifications Made
+
+- Removed unused legacy request handling from the modal message renderer.
+- Changed demo chat persistence to best-effort so fallback replies are not blocked by database latency.
+- Updated test/documentation wording for the direct join flow.
+- Added a final changelog entry for stale room-control cleanup.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — polishes recorded demo room behavior and removes stale request UI` → `studygroup/components/LobbyList.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — verifies optimistic join behavior for recorded demo lobby flow` → `studygroup/__tests__/LobbyList.join.test.tsx`
+
+---
+
+### Session 39 — Review finding fixes for demo reliability
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/app/api/demo/chat/route.ts` | Adds a three-second Gemini timeout so the chat route falls back quickly during recordings | Partial |
+| `studygroup/components/LobbyList.tsx` | Prevents realtime echoes from duplicating locally optimistic chat messages | Partial |
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Removes Aidan from the CS 3704 membership when reseeding so the Join group step is repeatable | Partial |
+| `README.md` | Documents the timeout, duplicate-message fix, and reseed behavior for the recorded demo | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: developer-phase-implementer, review-fix implementation
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "$developer-phase-implementer can you make those fixes wherever you can"
+
+#### What the Code Does and Whether It Met Expectations
+
+The demo chat route now wraps the Gemini REST call in an `AbortController` timeout. If Gemini is slow, unavailable, or returns an unusable response, the route returns the scripted fallback instead of leaving the UI stuck in a typing state.
+
+The lobby room now checks realtime inserts from the current user against locally optimistic chat messages and ignores matching echoes. This keeps recorded chat messages from appearing twice when Supabase Realtime is enabled.
+
+The demo seed now deletes any CS 3704 membership for `anguy98@vt.edu` before re-inserting seeded peer memberships. Rerunning the seed restores the recorded state where Aidan can search for CS 3704 and click `Join group`.
+
+#### Modifications Made
+
+- Added `GEMINI_TIMEOUT_MS` and abort handling around the provider fetch.
+- Added local-message echo detection in the lobby message realtime handler.
+- Added an idempotent membership delete for the demo viewer before seeding lobby members.
+- Updated README changelog entries for the review fixes.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds provider timeout so Gemini cannot block recorded demos` → `studygroup/app/api/demo/chat/route.ts`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — prevents realtime echoes from duplicating optimistic demo chat messages` → `studygroup/components/LobbyList.tsx`
+- `-- AI-ASSISTED: ChatGPT (GPT-5) — resets demo viewer membership so the CS 3704 join step remains recordable` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 40 — Hosted demo membership reset
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| Hosted Supabase project `vykutvpclkadshbrgpfr` | Removes the demo viewer from the seeded CS 3704 lobby so the Join group step is visible for recording | No |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: Supabase MCP SQL execution
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "$developer-phase-implementer can you make those fixes wherever you can"
+
+#### What the Code Does and Whether It Met Expectations
+
+The hosted Supabase project was updated with the same membership reset behavior now documented in the seed migration. The SQL removed any `lobby_members` row linking `anguy98@vt.edu` to the deterministic CS 3704 lobby (`aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1`). Verification showed the CS 3704 lobby still has Priya Shah and Marcus Johnson as members, while Aidan Nguyen is no longer a member, so the direct `Join group` step should be visible for the recorded demo.
+
+#### Modifications Made
+
+- Executed a targeted hosted-database delete for Aidan's CS 3704 membership.
+- Verified the remaining CS 3704 member rows after the delete.
+
+#### AI Comment Markers Added
+
+- No code files were changed for this hosted database operation.
+
+---
+
+### Session 41 — Joined groups sidebar tab
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Adds a left-sidebar `Groups` navigation tab | Partial |
+| `studygroup/app/(app)/groups/page.tsx` | Shows lobbies the signed-in student has joined or created, with a browse fallback when empty | Yes |
+| `README.md` | Documents the new joined-groups page and sidebar tab | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: focused implementation
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "in the sidebar to the left, lets make a \"Groups\" tab where you can view your currently join groups"
+
+#### What the Code Does and Whether It Met Expectations
+
+The sidebar now includes a `Groups` tab between Open lobbies and Schedule. The new `/groups` route queries the signed-in user's `lobby_members` rows, includes groups they host, and reuses the existing lobby list/card/modal experience for those current groups. If the student has no groups, the page shows a focused empty state with a `Find a group` call to action back to open lobbies.
+
+#### Modifications Made
+
+- Added the sidebar navigation link and active styling for `/groups`.
+- Added a server-rendered groups page using the existing Supabase server client and `LobbyList`.
+- Documented the new behavior in README.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds sidebar Groups tab for joined study groups` → `studygroup/components/AppHeader.tsx`
+- `// AI-GENERATED: ChatGPT (GPT-5) — joined groups page for the signed-in student's study groups` → `studygroup/app/(app)/groups/page.tsx`
+
+---
+
+### Session 42 — Demo stage membership reset and peer-filled lobbies
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql` | Resets all seeded demo lobby memberships for demo users, excludes Aidan, and fills every seeded lobby with fake peer members | Partial |
+| Hosted Supabase project `vykutvpclkadshbrgpfr` | Applies the same staged demo membership reset to the hosted database | No |
+| `README.md` | Documents the full fake peer roster behavior and Aidan membership reset | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: focused implementation plus Supabase MCP SQL execution
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "can you add fake people in the other lobbies too? and then set the stage for my demo (remove anguy98@vt.edu from any preexisting lobbies)"
+
+#### What the Code Does and Whether It Met Expectations
+
+The demo seed now deletes existing demo-user memberships for all deterministic seeded lobbies before inserting the intended fake roster. Aidan Nguyen (`anguy98@vt.edu`) is excluded from the inserted memberships, so the recording starts with no pre-joined groups for the demo viewer. Every seeded lobby now has visible fake members: CS 3704 keeps Priya Shah and Marcus Johnson, while the other course lobbies each have three fake peer members.
+
+The hosted Supabase project was updated with the same membership reset. Verification showed Aidan has zero lobby memberships and all seven seeded lobbies have peer member rows.
+
+#### Modifications Made
+
+- Expanded `lobby_members` seed rows for CS 3114, BIT 2406, CHEM 1035, PHYS 2305, ENGL 1106, and MATH 1226.
+- Changed the membership reset from only CS 3704/Aidan to all seeded demo lobbies and demo users before reseeding the intended roster.
+- Applied and verified the hosted membership reset through Supabase MCP.
+- Updated README changelog notes for the new demo staging behavior.
+
+#### AI Comment Markers Added
+
+- `-- AI-ASSISTED: ChatGPT (GPT-5) — fills every seeded lobby with fake peer members and clears Aidan memberships` → `studygroup/supabase/migrations/20260430150000_demo_open_lobbies_seed.sql`
+
+---
+
+### Session 43 — Visible create group flow
+
+#### What Was Built
+
+| File/Folder | What it does | AI-generated? |
+|---|---|---|
+| `studygroup/components/AppHeader.tsx` | Adds a prominent sidebar `Create group` action above the navigation tabs | Partial |
+| `studygroup/app/(app)/groups/page.tsx` | Adds `Create group` actions to the Groups page header and empty state | Partial |
+| `studygroup/components/NewLobbyForm.tsx` | Redirects newly created groups to the Groups page so users can see their own group immediately | Partial |
+| `studygroup/app/(app)/lobbies/new/page.tsx` | Updates creation page wording from lobby language to study group language | Partial |
+| `README.md` | Documents the visible create-group entry points | Partial |
+
+#### AI Tool(s) Used
+
+- **ChatGPT via Codex CLI**
+- Mode: focused implementation
+- Model: GPT-5
+
+#### Prompts Used
+
+1. "ok, theres no current way to MAKE MY OWN study group. can you do that??"
+
+#### What the Code Does and Whether It Met Expectations
+
+The signed-in sidebar now has a clear `Create group` action, so users can start their own study group without first discovering the lobbies page header. The Groups page also includes `Create group` in both the header and empty state. After submitting the existing creation form, the app redirects to `/groups`, where the newly hosted group appears as one of the user's current groups.
+
+#### Modifications Made
+
+- Added sidebar create action while keeping Open lobbies, Groups, and Schedule as navigation tabs.
+- Added Groups page create entry points.
+- Changed the create form success redirect from `/lobbies` to `/groups`.
+- Updated create page copy to say `Create a study group`.
+- Updated README changelog entries.
+
+#### AI Comment Markers Added
+
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds visible sidebar create-group action` → `studygroup/components/AppHeader.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — adds create-group entry points to the Groups page` → `studygroup/app/(app)/groups/page.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — returns users to their Groups page after creating a group` → `studygroup/components/NewLobbyForm.tsx`
+- `// AI-ASSISTED: ChatGPT (GPT-5) — aligns creation page wording with study groups` → `studygroup/app/(app)/lobbies/new/page.tsx`

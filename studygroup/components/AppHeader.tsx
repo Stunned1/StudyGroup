@@ -6,6 +6,8 @@
 // AI-ASSISTED: ChatGPT (GPT-5) — dark sidebar navigation without a separate profile settings tab
 // AI-ASSISTED: ChatGPT (GPT-5) — adds account schedule navigation tab
 // AI-ASSISTED: ChatGPT (GPT-5) — removes new lobby from the primary sidebar navigation
+// AI-ASSISTED: ChatGPT (GPT-5) — adds sidebar Groups tab for joined study groups
+// AI-ASSISTED: ChatGPT (GPT-5) — adds visible sidebar create-group action
 "use client";
 
 import Link from "next/link";
@@ -34,6 +36,12 @@ export default function AppHeader({ name, avatarUrl }: Props) {
 
       <nav className="flex flex-col gap-2 px-4 py-5">
         <Link
+          href="/lobbies/new"
+          className="rounded-xl bg-[#8b7bff] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#7968ff]"
+        >
+          Create group
+        </Link>
+        <Link
           href="/lobbies"
           className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
             pathname === "/lobbies"
@@ -42,6 +50,16 @@ export default function AppHeader({ name, avatarUrl }: Props) {
           }`}
         >
           Open lobbies
+        </Link>
+        <Link
+          href="/groups"
+          className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
+            pathname === "/groups"
+              ? "bg-[#8b7bff] text-white"
+              : "text-gray-400 hover:bg-white/5 hover:text-gray-100"
+          }`}
+        >
+          Groups
         </Link>
         <Link
           href="/schedule"

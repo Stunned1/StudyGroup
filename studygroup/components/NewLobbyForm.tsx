@@ -2,6 +2,8 @@
 // AI-ASSISTED: Cursor — VTLocation state typing for location select
 // AI-ASSISTED: ChatGPT (GPT-5) — dark-mode create lobby form styling
 // AI-ASSISTED: ChatGPT (GPT-5) — removes lobby duration from the creation flow
+// AI-ASSISTED: ChatGPT (GPT-5) — aligns create copy with group demo flow
+// AI-ASSISTED: ChatGPT (GPT-5) — returns users to their Groups page after creating a group
 "use client";
 
 import { useState } from "react";
@@ -37,7 +39,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/lobbies");
+      router.push("/groups");
       router.refresh();
     }
   }
@@ -99,7 +101,7 @@ export default function NewLobbyForm({ userId }: { userId: string }) {
         disabled={loading}
         className="rounded-lg bg-[#8b7bff] py-2 text-sm font-semibold text-white hover:bg-[#7968ff] disabled:opacity-50"
       >
-        {loading ? "Creating..." : "Create Lobby"}
+        {loading ? "Creating..." : "Create group"}
       </button>
     </form>
   );
